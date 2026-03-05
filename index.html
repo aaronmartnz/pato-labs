@@ -1,0 +1,3815 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organic Modules — Shape Your Design</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #f0ede8;
+    --fg: #1a1a1a;
+    --accent: #ff4d00;
+    --muted: #8a8578;
+    --card-bg: #ffffff;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* NAV — top bar with logo only */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 3rem;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--bg);
+    transition: background 0.3s, backdrop-filter 0.3s, box-shadow 0.3s;
+  }
+  nav.scrolled {
+    background: rgba(240, 237, 232, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+  }
+  nav.on-dark {
+    background: rgba(26, 26, 26, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.05);
+  }
+  nav .logo {
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+    transition: color 0.3s;
+  }
+  nav.on-dark .logo {
+    color: #fff;
+  }
+  nav .logo-svg .logo-back { fill: transparent; transition: fill 0.3s; }
+  nav .logo-svg .logo-front { fill: #1a1a1a; transition: fill 0.3s; }
+  nav.on-dark .logo-svg .logo-back { fill: #ffffff; }
+  nav.on-dark .logo-svg .logo-front { fill: #1a1a1a; }
+  nav .menu-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: none;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 100px;
+    padding: 0.5rem 1.2rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--fg);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  nav.on-dark .menu-toggle {
+    border-color: rgba(255,255,255,0.15);
+    color: #fff;
+  }
+  nav .menu-toggle:hover {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
+  }
+  nav.on-dark .menu-toggle:hover {
+    background: #fff;
+    color: var(--fg);
+  }
+  /* SIDE MENU */
+  .side-menu {
+    position: fixed;
+    top: 0; right: 0;
+    width: 400px;
+    max-width: 85vw;
+    height: 100vh;
+    background: var(--fg);
+    z-index: 200;
+    padding: 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow-y: auto;
+  }
+  .side-menu.open {
+    transform: translateX(0);
+  }
+  .side-menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 199;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  .side-menu-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .side-menu .menu-close {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    transition: color 0.2s;
+  }
+  .side-menu .menu-close:hover { color: #fff; }
+  .side-menu-nav {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .side-menu-nav li a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1rem 0;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.2s;
+  }
+  .side-menu-nav li a:hover {
+    padding-left: 0.5rem;
+  }
+  .side-menu-nav .menu-num {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.3);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    min-width: 24px;
+  }
+  .side-menu-nav .menu-label {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+  .side-menu-nav li a:hover .menu-label {
+    color: var(--accent);
+  }
+  .side-menu-nav .menu-type {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.25);
+    margin-left: auto;
+    font-weight: 500;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8rem 4rem 4rem;
+    position: relative;
+  }
+  .hero h1 {
+    font-size: clamp(4rem, 12vw, 11rem);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    max-width: 90%;
+  }
+  .hero h1 span {
+    color: var(--accent);
+    font-style: italic;
+  }
+  .hero .subtitle {
+    margin-top: 2.5rem;
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 500px;
+    line-height: 1.6;
+  }
+  .hero .scroll-hint {
+    position: absolute;
+    bottom: 3rem;
+    left: 4rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .hero .scroll-hint::before {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--muted);
+    display: inline-block;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* FLOATING SHAPES IN HERO */
+  .hero-shapes {
+    position: absolute;
+    right: 6%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 400px;
+    height: 400px;
+  }
+  .hero-shape {
+    position: absolute;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    animation: morph 8s ease-in-out infinite;
+  }
+  .hero-shape:nth-child(1) {
+    width: 300px; height: 300px;
+    background: var(--accent);
+    opacity: 0.9;
+    top: 0; left: 50px;
+  }
+  .hero-shape:nth-child(2) {
+    width: 200px; height: 200px;
+    background: transparent;
+    border: 3px solid var(--fg);
+    top: 100px; left: 0;
+    animation-delay: -3s;
+    border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%;
+  }
+  .hero-shape:nth-child(3) {
+    width: 150px; height: 150px;
+    background: var(--fg);
+    opacity: 0.15;
+    top: 180px; left: 200px;
+    animation-delay: -5s;
+  }
+  @keyframes morph {
+    0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+    25% { border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%; }
+    50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; }
+    75% { border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%; }
+  }
+
+  /* SECTION TITLES */
+  .section-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-size: clamp(2.2rem, 5vw, 4.2rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 0.8rem;
+  }
+  .section-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* PROPERTY SECTIONS */
+  .prop-section {
+    padding: 5rem 4rem;
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 3rem;
+    align-items: center;
+    min-height: 85vh;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .prop-section:nth-child(even) {
+    direction: rtl;
+  }
+  .prop-section:nth-child(even) > * {
+    direction: ltr;
+  }
+  /* Alternating wrapper backgrounds */
+  .section-wrap { width: 100%; }
+  .section-wrap.dark {
+    background: var(--fg);
+  }
+  .section-wrap.dark .section-label { color: rgba(255,255,255,0.35); }
+  .section-wrap.dark .section-title { color: #fff; }
+  .section-wrap.dark .prop-info p { color: rgba(255,255,255,0.45); }
+  .section-wrap.dark .prop-info .desc-es { color: rgba(255,255,255,0.3); }
+  .section-wrap.dark .control-row label { color: rgba(255,255,255,0.7); }
+  .section-wrap.dark .control-row .value { color: rgba(255,255,255,0.7); }
+  .section-wrap.dark .control-row input[type="range"] { background: rgba(255,255,255,0.15); }
+  .section-wrap.dark .control-row input[type="range"]::-webkit-slider-thumb { background: #fff; }
+  .section-wrap.dark .control-row input[type="color"] { border-color: rgba(255,255,255,0.2); }
+  .section-wrap.dark .playground {
+    background: rgba(255,255,255,0.06);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .section-wrap.dark .code-btn {
+    background: #fff;
+    color: var(--fg);
+  }
+  .section-wrap.dark .code-btn:hover {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .prop-info {
+    max-width: 500px;
+  }
+  .prop-info p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--muted);
+    margin-top: 1.2rem;
+    font-weight: 300;
+  }
+  .prop-info .desc-es {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: rgba(138,133,120,0.6);
+    margin-top: 0.6rem;
+    font-weight: 300;
+    font-style: italic;
+  }
+  /* Code btn — centered bottom with animated border */
+  .code-btn-bottom {
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem 0 3rem;
+  }
+  .code-btn-glow {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 2.2rem;
+    background: transparent;
+    border: none;
+    border-radius: 100px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--fg);
+    cursor: pointer;
+    transition: color 0.3s, transform 0.3s;
+    z-index: 1;
+  }
+  .code-btn-glow svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s;
+  }
+  .code-btn-glow:hover svg {
+    transform: translateX(2px);
+  }
+  .code-btn-glow:hover {
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
+  /* Animated gradient border */
+  .code-btn-glow::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 100px;
+    padding: 1.5px;
+    background: conic-gradient(
+      from var(--btn-angle, 0deg),
+      rgba(26,26,26,0.15) 0%,
+      var(--accent) 25%,
+      rgba(26,26,26,0.15) 50%,
+      var(--accent) 75%,
+      rgba(26,26,26,0.15) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: borderSpin 4s linear infinite;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+  }
+  .code-btn-glow:hover::before {
+    opacity: 1;
+  }
+  @keyframes borderSpin {
+    to { --btn-angle: 360deg; }
+  }
+  @property --btn-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+  /* Dark variant */
+  .section-wrap.dark .code-btn-glow,
+  .gallery-section .code-btn-glow,
+  .lattice-section .code-btn-glow,
+  .liquify-section .code-btn-glow,
+  .smudge-section .code-btn-glow,
+  .particle-section .code-btn-glow {
+    color: rgba(255,255,255,0.7);
+  }
+  .section-wrap.dark .code-btn-glow:hover,
+  .gallery-section .code-btn-glow:hover,
+  .lattice-section .code-btn-glow:hover,
+  .liquify-section .code-btn-glow:hover,
+  .smudge-section .code-btn-glow:hover,
+  .particle-section .code-btn-glow:hover {
+    color: var(--accent);
+  }
+  .section-wrap.dark .code-btn-glow::before,
+  .gallery-section .code-btn-glow::before,
+  .lattice-section .code-btn-glow::before,
+  .liquify-section .code-btn-glow::before,
+  .smudge-section .code-btn-glow::before,
+  .particle-section .code-btn-glow::before {
+    background: conic-gradient(
+      from var(--btn-angle, 0deg),
+      rgba(255,255,255,0.08) 0%,
+      var(--accent) 25%,
+      rgba(255,255,255,0.08) 50%,
+      var(--accent) 75%,
+      rgba(255,255,255,0.08) 100%
+    );
+  }
+
+  /* INTERACTIVE PLAYGROUND */
+  .playground {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.06);
+    max-width: 380px;
+    width: 100%;
+  }
+  .playground .shape-display {
+    width: 160px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .playground .shape-display > div {
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .playground .controls {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  .control-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+  }
+  .control-row label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: var(--fg);
+    min-width: 75px;
+  }
+  .control-row input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px;
+    background: #ddd;
+    border-radius: 3px;
+    outline: none;
+  }
+  .control-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--fg);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .control-row input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.3);
+  }
+  .control-row input[type="color"] {
+    -webkit-appearance: none;
+    width: 36px;
+    height: 36px;
+    border: 2px solid #eee;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+    overflow: hidden;
+  }
+  .control-row input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+  .control-row input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+  }
+  .control-row .value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    min-width: 45px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ORGANIC MODULES GALLERY */
+  .gallery-section {
+    padding: 8rem 4rem;
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .gallery-section .section-label {
+    color: rgba(255,255,255,0.4);
+  }
+  .gallery-section .section-title {
+    color: #fff;
+  }
+  .gallery-section p.desc {
+    color: rgba(255,255,255,0.5);
+    font-weight: 300;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    max-width: 550px;
+    margin-bottom: 4rem;
+  }
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .module-card {
+    aspect-ratio: 1;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .module-card:hover {
+    transform: scale(1.04);
+  }
+  .module-card .organic {
+    transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .module-card:hover .organic {
+    transform: scale(1.1) rotate(5deg);
+  }
+  .module-card .card-label {
+    position: absolute;
+    bottom: 1.2rem;
+    left: 1.2rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .module-card:hover .card-label {
+    opacity: 1;
+  }
+
+  /* MANIFESTO */
+  .manifesto {
+    padding: 10rem 4rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .manifesto h2 {
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    max-width: 900px;
+  }
+  .manifesto h2 em {
+    color: var(--accent);
+    font-style: italic;
+  }
+  .manifesto .cta {
+    margin-top: 3rem;
+    display: inline-block;
+    padding: 1.2rem 3rem;
+    background: var(--fg);
+    color: var(--bg);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 100px;
+    transition: all 0.3s;
+  }
+  .manifesto .cta:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(255, 77, 0, 0.3);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 3rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+  footer span {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  /* LIQUIFY SECTION */
+  .liquify-section {
+    padding: 8rem 4rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background: var(--fg);
+    cursor: crosshair;
+  }
+  .liquify-section .section-label {
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 3rem;
+  }
+  .liquify-text-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .liquify-text {
+    font-size: clamp(4rem, 10vw, 9rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    color: #fff;
+    text-align: center;
+    filter: url(#liquify-filter);
+    transition: filter 0.1s;
+    user-select: none;
+  }
+  .liquify-text em {
+    color: var(--accent);
+    font-style: italic;
+  }
+  .liquify-hint {
+    margin-top: 2.5rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.3);
+  }
+  .liquify-cursor {
+    position: fixed;
+    width: 80px;
+    height: 80px;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.3s;
+    mix-blend-mode: difference;
+  }
+  .liquify-section:hover .liquify-cursor {
+    opacity: 1;
+  }
+
+  /* MAGNET SECTION */
+  .magnet-section {
+    padding: 8rem 4rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+    cursor: none;
+  }
+  .magnet-section .section-label {
+    color: var(--muted);
+    margin-bottom: 3rem;
+  }
+  .magnet-text-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+  }
+  .magnet-line {
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+    line-height: 1;
+  }
+  .magnet-char {
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--fg);
+    display: inline-block;
+    will-change: transform, filter;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    user-select: none;
+  }
+  .magnet-char.accent {
+    color: var(--accent);
+    font-style: italic;
+  }
+  .magnet-char.space {
+    width: 0.3em;
+  }
+  .magnet-cursor {
+    position: fixed;
+    width: 100px;
+    height: 100px;
+    border: 1.5px solid rgba(26,26,26,0.15);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.4s;
+    background: radial-gradient(circle, rgba(255,77,0,0.06) 0%, transparent 70%);
+  }
+  .magnet-section:hover .magnet-cursor {
+    opacity: 1;
+  }
+  .magnet-hint {
+    margin-top: 3rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+  }
+
+  /* SMUDGE SECTION */
+  .smudge-section {
+    padding: 4rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background: var(--fg);
+    cursor: none;
+  }
+  .smudge-section .section-label {
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 2rem;
+  }
+  .smudge-canvas-wrap {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .smudge-canvas-wrap canvas {
+    display: block;
+    border-radius: 20px;
+  }
+  .smudge-cursor {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    border: 1.5px solid rgba(255,255,255,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .smudge-section:hover .smudge-cursor {
+    opacity: 1;
+  }
+  .smudge-controls {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+    align-items: center;
+  }
+  .smudge-controls label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.5);
+    font-weight: 600;
+  }
+  .smudge-controls input[type="range"] {
+    -webkit-appearance: none;
+    height: 3px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+    outline: none;
+    width: 100px;
+  }
+  .smudge-controls input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+  }
+  .smudge-btn {
+    padding: 0.6rem 1.5rem;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.7);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .smudge-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+  }
+  .smudge-hint {
+    margin-top: 1.5rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.25);
+  }
+
+  /* HOVER SMUDGE SECTION */
+  .hsmudge-section {
+    padding: 4rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+    cursor: none;
+  }
+  .hsmudge-section .section-label {
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+  .hsmudge-canvas-wrap {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+  }
+  .hsmudge-canvas-wrap canvas {
+    display: block;
+    border-radius: 20px;
+  }
+  .hsmudge-cursor {
+    position: fixed;
+    width: 80px;
+    height: 80px;
+    border: 1.5px solid rgba(26,26,26,0.15);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.3s;
+    background: radial-gradient(circle, rgba(255,77,0,0.04) 0%, transparent 70%);
+  }
+  .hsmudge-section:hover .hsmudge-cursor {
+    opacity: 1;
+  }
+  .hsmudge-hint {
+    margin-top: 2rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    opacity: 0.5;
+  }
+
+  /* BLUR & LATTICE SECTION */
+  .lattice-section {
+    padding: 6rem 4rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    background: var(--fg);
+    overflow: hidden;
+  }
+  .lattice-section .section-label {
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 1.5rem;
+  }
+  .lattice-section .section-title {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  .lattice-section .desc {
+    color: rgba(255,255,255,0.4);
+    font-weight: 300;
+    font-size: 1rem;
+    text-align: center;
+    max-width: 500px;
+    margin-bottom: 2.5rem;
+  }
+  .lattice-controls {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+  }
+  .lattice-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .lattice-ctrl label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.5);
+    font-weight: 600;
+  }
+  .lattice-ctrl input[type="range"] {
+    -webkit-appearance: none;
+    height: 3px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+    outline: none;
+    width: 80px;
+  }
+  .lattice-ctrl input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+  }
+  .lattice-ctrl input[type="color"] {
+    -webkit-appearance: none;
+    width: 28px;
+    height: 28px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+    background: transparent;
+  }
+  .lattice-ctrl input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+  .lattice-ctrl input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
+  .lattice-grid {
+    display: grid;
+    gap: 12px;
+    width: 100%;
+    max-width: 800px;
+  }
+  .lattice-cell {
+    aspect-ratio: 1;
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    cursor: pointer;
+    position: relative;
+  }
+  .lattice-cell:hover {
+    transform: scale(1.08);
+    z-index: 2;
+  }
+  .lattice-presets {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+  }
+  .preset-btn {
+    padding: 0.5rem 1.2rem;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 100px;
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .preset-btn:hover, .preset-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* DRAW SECTION */
+  .draw-section {
+    padding: 4rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .draw-section .section-label {
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+  .draw-section .section-title {
+    color: var(--fg);
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  .draw-section .desc {
+    color: var(--muted);
+    font-weight: 300;
+    font-size: 1rem;
+    text-align: center;
+    max-width: 480px;
+    margin-bottom: 2rem;
+  }
+  .draw-section .desc-es {
+    color: rgba(138,133,120,0.5);
+    font-size: 0.88rem;
+    font-style: italic;
+    text-align: center;
+    max-width: 480px;
+    margin-bottom: 2rem;
+  }
+  .draw-toolbar {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    background: #fff;
+    padding: 0.8rem 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  .draw-tool-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .draw-tool-group label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .draw-tool-group input[type="range"] {
+    -webkit-appearance: none;
+    height: 3px;
+    background: #e0ddd8;
+    border-radius: 3px;
+    outline: none;
+    width: 70px;
+  }
+  .draw-tool-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--fg);
+    cursor: pointer;
+  }
+  .draw-tool-group input[type="color"] {
+    -webkit-appearance: none;
+    width: 28px;
+    height: 28px;
+    border: 2px solid #eee;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+  }
+  .draw-tool-group input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+  .draw-tool-group input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
+  .draw-tip-btn {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #e0ddd8;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+  }
+  .draw-tip-btn:hover { border-color: var(--muted); }
+  .draw-tip-btn.active {
+    border-color: var(--accent);
+    background: rgba(255,77,0,0.06);
+  }
+  .draw-tip-btn svg { width: 16px; height: 16px; }
+  .draw-action-btn {
+    padding: 0.4rem 1rem;
+    border: 1px solid #e0ddd8;
+    border-radius: 100px;
+    background: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .draw-action-btn:hover {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
+  }
+  .draw-canvas-wrap {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+    cursor: crosshair;
+    position: relative;
+  }
+  .draw-canvas-wrap canvas {
+    display: block;
+    border-radius: 20px;
+  }
+
+  /* PARTICLE TRAIL SECTION */
+  .particle-section {
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background: var(--fg);
+    cursor: none;
+  }
+  .particle-section .section-label { color: rgba(255,255,255,0.4); margin-bottom: 1.5rem; }
+  .particle-section .section-title { color: #fff; text-align: center; margin-bottom: 0.5rem; }
+  .particle-section .desc { color: rgba(255,255,255,0.4); font-weight: 300; font-size: 1rem; text-align: center; max-width: 500px; margin-bottom: 0.5rem; }
+  .particle-section .desc-es { color: rgba(255,255,255,0.25); font-size: 0.88rem; font-style: italic; text-align: center; max-width: 500px; margin-bottom: 2rem; }
+  .particle-toolbar {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    background: rgba(255,255,255,0.06);
+    padding: 0.8rem 1.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .particle-toolbar .draw-tool-group label { color: rgba(255,255,255,0.45); }
+  .particle-toolbar input[type="range"] {
+    -webkit-appearance: none; height: 3px; background: rgba(255,255,255,0.15); border-radius: 3px; outline: none; width: 70px;
+  }
+  .particle-toolbar input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; cursor: pointer;
+  }
+  .particle-toolbar input[type="color"] {
+    -webkit-appearance: none; width: 28px; height: 28px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; cursor: pointer; padding: 0; background: transparent;
+  }
+  .particle-toolbar input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+  .particle-toolbar input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
+  .particle-toolbar .draw-tip-btn {
+    border-color: rgba(255,255,255,0.15);
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+  }
+  .particle-toolbar .draw-tip-btn:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
+  .particle-toolbar .draw-tip-btn.active { border-color: var(--accent); background: rgba(255,77,0,0.15); color: var(--accent); }
+  .particle-toolbar .draw-action-btn {
+    border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); background: transparent;
+  }
+  .particle-toolbar .draw-action-btn:hover { background: #fff; color: var(--fg); border-color: #fff; }
+  .particle-toolbar .sep { width: 1px; height: 24px; background: rgba(255,255,255,0.1); }
+  .particle-canvas-wrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .particle-canvas-wrap canvas { display: block; width: 100%; height: 100%; }
+  .particle-cursor {
+    position: fixed;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .particle-section:hover .particle-cursor { opacity: 0.6; }
+  .particle-section .section-label,
+  .particle-section .section-title,
+  .particle-section .desc,
+  .particle-section .desc-es {
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .particle-section .particle-toolbar,
+  .particle-section .code-btn-bottom {
+    position: relative;
+    z-index: 3;
+  }
+  .particle-section .section-label { padding-top: 4rem; }
+  .particle-section .code-btn-bottom { padding-bottom: 3rem; }
+  .svg-upload-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 1rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 100px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .svg-upload-label:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .svg-upload-label input { display: none; }
+  .svg-upload-label svg { width: 14px; height: 14px; }
+  .custom-svg-badge {
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--accent);
+    border-radius: 100px;
+    display: none;
+  }
+  .custom-svg-badge.visible { display: inline-block; }
+
+  /* CODE MODAL */
+
+  /* Ensure sections have relative positioning */
+  .prop-section,
+  .liquify-section,
+  .magnet-section,
+  .smudge-section,
+  .hsmudge-section,
+  .gallery-section,
+  .lattice-section {
+    position: relative;
+  }
+
+  /* Modal overlay */
+  .code-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26,26,26,0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .code-modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .code-modal {
+    background: #1a1a1a;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 720px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden;
+  }
+  .code-modal-overlay.active .code-modal {
+    transform: translateY(0) scale(1);
+  }
+  .code-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .code-modal-header h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #fff;
+    font-weight: 700;
+  }
+  .code-modal-header .modal-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .modal-copy-btn,
+  .modal-close-btn {
+    padding: 0.45rem 1rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 100px;
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-copy-btn:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .modal-copy-btn.copied {
+    background: #2ecc71;
+    border-color: #2ecc71;
+    color: #fff;
+  }
+  .modal-close-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+  }
+  .code-modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .code-modal-body pre {
+    margin: 0;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.78rem;
+    line-height: 1.65;
+    color: rgba(255,255,255,0.75);
+    white-space: pre-wrap;
+    word-break: break-word;
+    tab-size: 2;
+  }
+  .code-modal-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .code-tab {
+    padding: 0.7rem 1.2rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: rgba(255,255,255,0.4);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .code-tab:hover {
+    color: rgba(255,255,255,0.7);
+  }
+  .code-tab.active {
+    color: #fff;
+    border-bottom-color: var(--accent);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .prop-section {
+      grid-template-columns: 1fr;
+      padding: 5rem 2rem;
+    }
+    .prop-section:nth-child(even) { direction: ltr; }
+    .hero { padding: 6rem 2rem 3rem; }
+    .hero-shapes { display: none; }
+    .modules-grid { grid-template-columns: repeat(2, 1fr); }
+    nav { padding: 1.5rem 2rem; }
+    .gallery-section, .manifesto, footer { padding-left: 2rem; padding-right: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo"><svg class="logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 606.61 606.61" style="width:28px;height:28px;vertical-align:middle;margin-right:8px;"><path class="logo-back" d="M171.18,601.95c-17.29,0-33.02-.47-46.76-1.38-28.9-1.92-82.68-5.51-85.13-48.4-.77-13.47,4.39-24.65,11.94-33.99-30.76-33.78-47.48-78.26-46.39-124.65.87-36.7,13.53-73.04,35.65-102.33,12.43-16.47,27.39-30.45,44.13-41.55-17.26-2.96-32.5-14.14-40.31-30.13-6.45-13.21-7.37-28.15-2.58-42.05,4.78-13.91,14.69-25.11,27.91-31.57,33.67-16.43,69.79-24.75,107.34-24.75,26.45,0,52.19,4.13,76.85,12.31-1.64-7.89-1.12-15.95,1.73-23.96,2.99-8.34,7.48-20.92,102.74-96.98,6.07-4.86,13.71-7.53,21.52-7.53,3.95,0,7.85.67,11.57,2,11.18,3.98,19.65,13.67,22.13,25.27,25.5,119.17,21.02,131.76,18.05,140.09-.65,1.83-1.62,4.12-3.04,6.62,16.29-1.41,32-5.74,46.83-12.93,7.56-3.66,15.63-5.52,23.99-5.52,20.97,0,40.42,12.19,49.56,31.05,13.03,26.87,2.14,59.25-24.24,72.9,34.93,31.86,56.83,76.98,58.68,124.88,1.89,48.88-15.75,95.22-49.68,130.49-33.95,35.29-79.55,54.73-128.39,54.73-1.17,0-2.34-.02-3.49-.05-.62,0-1.36.17-2.1.48-11.04,4.76-25.72,8.71-46.18,12.45-30.23,5.52-70.82,9.94-114.27,12.42-23.87,1.37-46.77,2.06-68.09,2.06ZM405.31,485.51c-49.14,0-89.12-39.98-89.12-89.13s39.98-89.13,89.12-89.13,89.13,39.98,89.13,89.13-39.98,89.13-89.13,89.13Z"/><path class="logo-front" d="M469.17,257.73c14.78-3.64,29.19-8.78,43.12-15.53,14.7-7.12,20.83-24.81,13.71-39.5-7.12-14.69-24.81-20.84-39.5-13.71-21.9,10.61-45.39,15.99-69.83,15.99s-48.22-5.44-70.22-16.18c-4.18-2.04-8.59-3-12.95-3-10.95,0-21.47,6.11-26.59,16.61-7.16,14.67-1.07,32.38,13.6,39.54,9.78,4.77,19.81,8.7,30.02,11.94-21.97,8.48-41.52,21.86-57.25,38.84-29.86-31.16-72.64-49.61-119.01-46.97-45,2.57-85.91,24.34-113.45,60.81-19.04,25.21-29.76,55.99-30.51,87.57-1.08,45.65,17.43,88.1,51.04,118.07,2.44,2.17,4.95,4.22,7.5,6.22-18.02,12.93-24.68,22.75-24.13,32.31.84,14.69,18.05,21.54,61.37,24.42,13.25.88,28.49,1.32,45.08,1.32,20.56,0,43.18-.67,66.63-2.01,42.4-2.42,81.87-6.71,111.15-12.05,18.05-3.3,31.36-6.77,40.68-10.78,4.08-1.76,8.46-2.64,12.91-2.54.92.02,1.83.03,2.75.03,86.21,0,155.97-71.81,152.6-158.75-2.26-58.41-38.06-109.07-88.74-132.62ZM52.85,405.66c-1.99-34.77,9.68-68.23,32.86-94.22,23.17-25.99,55.09-41.4,89.86-43.39,2.53-.14,5.03-.22,7.53-.22,37.74,0,72.11,16.34,96.09,42.55-16.76,24.51-26.59,54.12-26.59,85.99,0,10.01.99,19.78,2.85,29.25,1.31,6.68-2.81,13.23-9.41,14.89-8.14,2.04-16.13,4.79-24.04,7.98,15.98-12.41,25.8-32.19,24.56-53.92-1.91-33.4-30.25-60.15-63.7-60.01-36.78.15-65.45,31.04-63.38,67.28,2.01,35.09,32.08,61.91,67.17,59.9,2.93-.17,5.77-.6,8.56-1.14-38.06,18.4-66.14,32.88-86.27,44.86-4.4-3.04-8.65-6.33-12.7-9.95-25.99-23.18-41.4-55.09-43.39-89.86ZM333.11,542.46c-24.19,3.83-56.43,7.38-96.49,9.68-82.7,4.73-132.92.35-147.64-4.91,14.4-17.56,92.74-55.31,119.65-68.28,16.71-8.05,31.94-14.75,47.22-17.99,5.81-1.23,11.7,1.48,14.48,6.72,14.5,27.34,37.04,49.77,64.47,64.11,4.86,2.54,3.73,9.81-1.69,10.67ZM405.31,526.75c-71.89,0-130.38-58.49-130.38-130.38s58.49-130.38,130.38-130.38,130.38,58.49,130.38,130.38-58.49,130.38-130.38,130.38ZM405.31,332.74c-35.15,0-63.64,28.49-63.64,63.64s28.49,63.64,63.64,63.64,63.64-28.49,63.64-63.64-28.49-63.64-63.64-63.64ZM333.01,170.53c14.38,5.13,29.99,8.45,43.29,8.45,15.21,0,27.4-4.32,31.28-15.16h0c4.37-12.25-10-84.34-18.96-126.22-.65-3.05-2.84-5.54-5.77-6.58-2.93-1.04-6.2-.5-8.63,1.44-33.47,26.72-90.26,73.39-94.64,85.63-7.26,20.33,22.61,41.44,53.43,52.45ZM374.04,55.66c5.42,26.23,10.41,52.87,13.48,72.59-9.57-6.73-21.34-12.6-33.37-16.9-12.01-4.29-24.83-7.23-36.49-8.11,14.87-13.3,35.59-30.74,56.38-47.58ZM296.74,123.96c1.27-1.61,6.17-3.03,14.08-3.03,9.04,0,21.88,1.83,37.28,7.34,28.96,10.34,42.61,24.87,42.49,29.23,0,.08,0,.22-.02.3-.17.26-.6.49-.96.74-.25.17-.37.34-.71.5-.57.27-1.4.5-2.22.72-.35.1-.59.22-.98.31-1.03.23-2.31.39-3.62.53-.37.04-.65.11-1.05.15-1.44.12-3.12.14-4.84.14-.43,0-.77.04-1.21.03-1.77-.03-3.77-.19-5.79-.38-.54-.05-.99-.05-1.54-.11-2.05-.22-4.32-.6-6.6-.99-.66-.11-1.23-.16-1.9-.29-2.33-.45-4.86-1.08-7.4-1.73-.74-.19-1.41-.3-2.17-.51-3.35-.92-6.86-2.02-10.52-3.32-29.27-10.46-42.94-25.21-42.54-29.32.06-.09.15-.21.21-.31ZM93.82,224.95c4.35,0,8.77-.96,12.95-3,22.01-10.74,45.63-16.18,70.22-16.18s47.93,5.38,69.83,15.99c14.7,7.12,32.38.98,39.5-13.71,7.12-14.69.98-32.38-13.71-39.5-30-14.54-62.17-21.91-95.62-21.91s-66.01,7.46-96.16,22.17c-14.68,7.16-20.77,24.86-13.6,39.54,5.12,10.5,15.65,16.61,26.59,16.61Z"/></svg>PATO Labs</div>
+  <button class="menu-toggle" onclick="toggleSideMenu()"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>Menu</button>
+</nav>
+
+<!-- SIDE MENU -->
+<div class="side-menu-overlay" id="side-menu-overlay" onclick="toggleSideMenu()"></div>
+<div class="side-menu" id="side-menu">
+  <button class="menu-close" onclick="toggleSideMenu()">&times;</button>
+  <ul class="side-menu-nav">
+    <li><a href="#stroke" onclick="toggleSideMenu()"><span class="menu-num">01</span><span class="menu-label">Stroke</span><span class="menu-type">Property</span></a></li>
+    <li><a href="#fill" onclick="toggleSideMenu()"><span class="menu-num">02</span><span class="menu-label">Fill</span><span class="menu-type">Property</span></a></li>
+    <li><a href="#radius" onclick="toggleSideMenu()"><span class="menu-num">03</span><span class="menu-label">Corner Radius</span><span class="menu-type">Property</span></a></li>
+    <li><a href="#opacity" onclick="toggleSideMenu()"><span class="menu-num">04</span><span class="menu-label">Opacity</span><span class="menu-type">Property</span></a></li>
+    <li><a href="#gallery" onclick="toggleSideMenu()"><span class="menu-num">—</span><span class="menu-label">Organic Modules</span><span class="menu-type">Gallery</span></a></li>
+    <li><a href="#lattice" onclick="toggleSideMenu()"><span class="menu-num">05</span><span class="menu-label">Blur & Lattice</span><span class="menu-type">Property</span></a></li>
+    <li><a href="#liquify" onclick="toggleSideMenu()"><span class="menu-num">06</span><span class="menu-label">Liquify</span><span class="menu-type">Experiment</span></a></li>
+    <li><a href="#magnet" onclick="toggleSideMenu()"><span class="menu-num">07</span><span class="menu-label">Magnetic Field</span><span class="menu-type">Experiment</span></a></li>
+    <li><a href="#smudge" onclick="toggleSideMenu()"><span class="menu-num">08</span><span class="menu-label">Smudge</span><span class="menu-type">Experiment</span></a></li>
+    <li><a href="#hsmudge" onclick="toggleSideMenu()"><span class="menu-num">09</span><span class="menu-label">Melt & Recover</span><span class="menu-type">Experiment</span></a></li>
+    <li><a href="#draw" onclick="toggleSideMenu()"><span class="menu-num">10</span><span class="menu-label">Freehand Draw</span><span class="menu-type">Experiment</span></a></li>
+    <li><a href="#particles" onclick="toggleSideMenu()"><span class="menu-num">11</span><span class="menu-label">Shape Emitter</span><span class="menu-type">Experiment</span></a></li>
+  </ul>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Shape<br><span>Organic</span><br>Modules</h1>
+  <p class="subtitle">Domina las propiedades visuales fundamentales. Stroke, fill, radius y opacidad aplicadas a objetos para crear composiciones modulares y vivas.</p>
+  <div class="scroll-hint">Scroll to explore</div>
+  <div class="hero-shapes">
+    <div class="hero-shape"></div>
+    <div class="hero-shape"></div>
+    <div class="hero-shape"></div>
+  </div>
+</section>
+
+<!-- STROKE -->
+<div class="section-wrap dark">
+<section class="prop-section" id="stroke">
+  <div class="prop-info">
+    <div class="section-label">01 — Property</div>
+    <h2 class="section-title">Stroke</h2>
+    <p>The stroke defines the outline of every shape. Control its weight, color and style to transform simple objects into elements with character and visual presence.</p>
+    <p class="desc-es">El trazo define el contorno de cada forma. Controla su grosor, color y estilo para transformar objetos simples en elementos con presencia visual.</p>
+  </div>
+  <div class="playground">
+    <div class="shape-display">
+      <div id="stroke-shape" style="width:120px;height:120px;border-radius:30% 70% 70% 30%/30% 30% 70% 70%;background:transparent;border:3px solid #fff;"></div>
+    </div>
+    <div class="controls">
+      <div class="control-row">
+        <label>Width</label>
+        <input type="range" min="1" max="20" value="3" oninput="updateStroke()">
+        <span class="value">3px</span>
+      </div>
+      <div class="control-row">
+        <label>Color</label>
+        <input type="color" value="#ffffff" oninput="updateStroke()">
+      </div>
+      <div class="control-row">
+        <label>Dash</label>
+        <input type="range" min="0" max="30" value="0" oninput="updateStroke()">
+        <span class="value">0</span>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="code-btn-bottom"><button class="code-btn-glow" onclick="openCodeModal('stroke')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Get Code</button></div>
+</div>
+
+<!-- FILL -->
+<div class="section-wrap">
+<section class="prop-section" id="fill">
+  <div class="prop-info">
+    <div class="section-label">02 — Property</div>
+    <h2 class="section-title">Fill</h2>
+    <p>Fill gives life and personality to the object. From solid colors to gradients, fill is the layer that transforms an empty shape into an expressive element.</p>
+    <p class="desc-es">El relleno le da vida y personalidad al objeto. Desde colores solidos hasta gradientes, el fill transforma una forma vacia en un elemento expresivo.</p>
+  </div>
+  <div class="playground">
+    <div class="shape-display">
+      <div id="fill-shape" style="width:130px;height:130px;border-radius:58% 42% 75% 25%/76% 46% 54% 24%;background:#ff4d00;"></div>
+    </div>
+    <div class="controls">
+      <div class="control-row">
+        <label>Color 1</label>
+        <input type="color" value="#ff4d00" oninput="updateFill()">
+      </div>
+      <div class="control-row">
+        <label>Color 2</label>
+        <input type="color" value="#ff4d00" oninput="updateFill()">
+      </div>
+      <div class="control-row">
+        <label>Angle</label>
+        <input type="range" min="0" max="360" value="135" oninput="updateFill()">
+        <span class="value">135&deg;</span>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="code-btn-bottom"><button class="code-btn-glow" onclick="openCodeModal('fill')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Get Code</button></div>
+</div>
+
+<!-- CORNER RADIUS -->
+<div class="section-wrap dark">
+<section class="prop-section" id="radius">
+  <div class="prop-info">
+    <div class="section-label">03 — Property</div>
+    <h2 class="section-title">Corner<br>Radius</h2>
+    <p>Corner radius softens edges. From geometric and rigid to organic and fluid. It bridges the angular and the natural.</p>
+    <p class="desc-es">El radio de esquina suaviza las aristas. De geometrico y rigido a organico y fluido. Es el puente entre lo angular y lo natural.</p>
+  </div>
+  <div class="playground">
+    <div class="shape-display">
+      <div id="radius-shape" style="width:120px;height:120px;background:#fff;border-radius:0;"></div>
+    </div>
+    <div class="controls">
+      <div class="control-row" style="padding-bottom:0.6rem;margin-bottom:0.6rem;border-bottom:1px solid rgba(255,255,255,0.1);">
+        <label style="color:var(--accent);font-weight:800;">All</label>
+        <input type="range" min="0" max="50" value="0" id="radius-all" oninput="updateRadiusAll(this.value)">
+        <span class="value" id="radius-all-val">0%</span>
+      </div>
+      <div class="control-row">
+        <label>Top-Left</label>
+        <input type="range" min="0" max="50" value="0" class="radius-single" oninput="updateRadius()">
+        <span class="value">0%</span>
+      </div>
+      <div class="control-row">
+        <label>Top-Right</label>
+        <input type="range" min="0" max="50" value="0" class="radius-single" oninput="updateRadius()">
+        <span class="value">0%</span>
+      </div>
+      <div class="control-row">
+        <label>Bot-Right</label>
+        <input type="range" min="0" max="50" value="0" class="radius-single" oninput="updateRadius()">
+        <span class="value">0%</span>
+      </div>
+      <div class="control-row">
+        <label>Bot-Left</label>
+        <input type="range" min="0" max="50" value="0" class="radius-single" oninput="updateRadius()">
+        <span class="value">0%</span>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="code-btn-bottom"><button class="code-btn-glow" onclick="openCodeModal('radius')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Get Code</button></div>
+</div>
+
+<!-- OPACITY -->
+<div class="section-wrap">
+<section class="prop-section" id="opacity">
+  <div class="prop-info">
+    <div class="section-label">04 — Property</div>
+    <h2 class="section-title">Opacity</h2>
+    <p>Opacity controls transparency. It creates layers, depth and visual hierarchy. The solid becomes subtle, the dense becomes ethereal.</p>
+    <p class="desc-es">La opacidad controla la transparencia. Permite crear capas, profundidad y jerarquia visual. Lo solido se convierte en sutil, lo denso en etereo.</p>
+  </div>
+  <div class="playground">
+    <div class="shape-display" style="position:relative;">
+      <div id="opacity-shape-bg" style="width:130px;height:130px;border-radius:50%;background:var(--accent);position:absolute;"></div>
+      <div id="opacity-shape" style="width:100px;height:100px;border-radius:33% 67% 58% 42%/63% 68% 32% 37%;background:#1a1a1a;opacity:0.8;position:relative;left:20px;top:8px;"></div>
+    </div>
+    <div class="controls">
+      <div class="control-row">
+        <label>Opacity</label>
+        <input type="range" min="0" max="100" value="80" oninput="updateOpacity()">
+        <span class="value">80%</span>
+      </div>
+      <div class="control-row">
+        <label>BG Color</label>
+        <input type="color" value="#ff4d00" oninput="updateOpacity()">
+      </div>
+      <div class="control-row">
+        <label>FG Color</label>
+        <input type="color" value="#1a1a1a" oninput="updateOpacity()">
+      </div>
+    </div>
+  </div>
+</section>
+<div class="code-btn-bottom"><button class="code-btn-glow" onclick="openCodeModal('opacity')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Get Code</button></div>
+</div>
+
+<!-- GALLERY -->
+<section class="gallery-section" id="gallery">
+  <div class="section-label">Resultado</div>
+  <h2 class="section-title">Organic<br>Modules</h2>
+  <p class="desc">Combinando las cuatro propiedades, cada forma se convierte en un modulo unico. Aqui tienes una galeria de composiciones generadas con stroke, fill, radius y opacidad.</p>
+  <div class="modules-grid">
+    <div class="module-card" style="background:#ff4d00;">
+      <div class="organic" style="width:60%;height:60%;border-radius:30% 70% 70% 30%/30% 30% 70% 70%;background:transparent;border:3px solid #fff;"></div>
+      <span class="card-label" style="color:#fff;">Stroke Only</span>
+    </div>
+    <div class="module-card" style="background:#e8e4dd;">
+      <div class="organic" style="width:55%;height:55%;border-radius:58% 42% 75% 25%/76% 46% 54% 24%;background:linear-gradient(135deg,#ff4d00,#ff8c42);"></div>
+      <span class="card-label" style="color:#1a1a1a;">Gradient Fill</span>
+    </div>
+    <div class="module-card" style="background:#1a1a1a;grid-column:span 2;">
+      <div class="organic" style="width:35%;height:70%;border-radius:50% 50% 33% 67%/55% 27% 73% 45%;background:#ff4d00;opacity:0.7;position:absolute;left:25%;"></div>
+      <div class="organic" style="width:30%;height:60%;border-radius:33% 67% 58% 42%/63% 68% 32% 37%;background:#fff;opacity:0.15;position:absolute;right:20%;"></div>
+      <span class="card-label" style="color:#fff;">Layered Opacity</span>
+    </div>
+    <div class="module-card" style="background:#2a2a2a;grid-column:span 2;">
+      <div class="organic" style="width:200px;height:200px;border-radius:0 50% 50% 0;border:2px solid rgba(255,255,255,0.2);background:transparent;"></div>
+      <div class="organic" style="width:150px;height:150px;border-radius:50% 0 50% 50%;background:var(--accent);opacity:0.5;position:absolute;right:30%;"></div>
+      <span class="card-label" style="color:#fff;">Mixed Radius</span>
+    </div>
+    <div class="module-card" style="background:linear-gradient(180deg,#ff4d00,#cc3d00);">
+      <div class="organic" style="width:70%;height:70%;border-radius:50%;background:rgba(255,255,255,0.2);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.3);"></div>
+      <span class="card-label" style="color:#fff;">Glass Fill</span>
+    </div>
+    <div class="module-card" style="background:#e8e4dd;">
+      <div class="organic" style="width:50%;height:50%;border-radius:20%;background:#1a1a1a;"></div>
+      <div class="organic" style="width:40%;height:40%;border-radius:50%;background:transparent;border:2px dashed #ff4d00;position:absolute;top:20%;right:20%;"></div>
+      <span class="card-label" style="color:#1a1a1a;">Stroke + Fill</span>
+    </div>
+  </div>
+</section>
+
+<!-- BLUR & LATTICE -->
+<section class="lattice-section" id="lattice">
+  <div class="section-label">05 — Propiedad</div>
+  <h2 class="section-title">Blur, Color<br>& Lattice</h2>
+  <p class="desc">Combina blur, color y formas variadas en una celosia interactiva. Cada celda responde a tus ajustes en tiempo real.</p>
+  <div class="lattice-presets">
+    <button class="preset-btn active" onclick="setLatticePreset('circles', this)">Circles</button>
+    <button class="preset-btn" onclick="setLatticePreset('mixed', this)">Mixed</button>
+    <button class="preset-btn" onclick="setLatticePreset('organic', this)">Organic</button>
+    <button class="preset-btn" onclick="setLatticePreset('squares', this)">Squares</button>
+  </div>
+  <div class="lattice-controls">
+    <div class="lattice-ctrl">
+      <label>Blur</label>
+      <input type="range" min="0" max="20" value="0" id="lat-blur" oninput="updateLattice()">
+    </div>
+    <div class="lattice-ctrl">
+      <label>Color</label>
+      <input type="color" value="#ff4d00" id="lat-color" oninput="updateLattice()">
+    </div>
+    <div class="lattice-ctrl">
+      <label>Size</label>
+      <input type="range" min="40" max="100" value="75" id="lat-size" oninput="updateLattice()">
+    </div>
+    <div class="lattice-ctrl">
+      <label>Gap</label>
+      <input type="range" min="4" max="30" value="12" id="lat-gap" oninput="updateLattice()">
+    </div>
+    <div class="lattice-ctrl">
+      <label>Opacity</label>
+      <input type="range" min="10" max="100" value="100" id="lat-opacity" oninput="updateLattice()">
+    </div>
+    <div class="lattice-ctrl">
+      <label>Columns</label>
+      <input type="range" min="3" max="10" value="6" id="lat-cols" oninput="rebuildLattice()">
+    </div>
+  </div>
+  <div class="lattice-grid" id="lattice-grid"></div>
+  <div class="code-btn-bottom"><button class="code-btn-glow" onclick="openCodeModal('lattice')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Get Code</button></div>
+</section>
+
+<!-- LIQUIFY -->
+<section class="liquify-section" id="liquify" onmousemove="handleLiquify(event)" onmouseleave="resetLiquify()">
+  <svg style="position:absolute;width:0;height:0;">
+    <defs>
+      <filter id="liquify-filter">
+        <feTurbulence id="liquify-turb" type="turbulence" baseFrequency="0.01 0.01" numOctaves="3" seed="2" result="turbulence"/>
+        <feDisplacementMap id="liquify-disp" in="SourceGraphic" in2="turbulence" scale="0" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+  </svg>
+  <div class="liquify-cursor" id="liquify-cursor"></div>
+  <div class="section-label">06 — Experiment</div>
+  <div class="liquify-text-wrap">
+    <div class="liquify-text">Distort</div>
+    <div class="liquify-text">& <em>Liquify</em></div>
+    <div class="liquify-text">Reality</div>
+  </div>
+  <div class="liquify-hint">Move your cursor over the text</div>
+  <div class="code-btn-bottom"><button class="code-btn-glow" onclick="openCodeModal('liquify')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Get Code</button></div>
+</section>
+
+<!-- MAGNET -->
+<section class="magnet-section" id="magnet" onmousemove="handleMagnet(event)" onmouseleave="resetMagnet()">
+  <div class="magnet-cursor" id="magnet-cursor"></div>
+  <div class="section-label">07 — Experiment</div>
+  <div class="magnet-text-wrap" id="magnet-text-wrap">
+    <div class="magnet-line" data-text="Magnetic"></div>
+    <div class="magnet-line" data-text="Field" data-accent="true"></div>
+    <div class="magnet-line" data-text="Distortion"></div>
+  </div>
+  <div class="magnet-hint">Hover slowly over the text</div>
+  <div class="code-btn-bottom"><button class="code-btn-glow" onclick="openCodeModal('magnet')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Get Code</button></div>
+</section>
+
+<!-- SMUDGE -->
+<section class="smudge-section" id="smudge" onmousemove="handleSmudgeCursor(event)">
+  <div class="smudge-cursor" id="smudge-cursor"></div>
+  <div class="section-label">08 — Experiment</div>
+  <div class="smudge-canvas-wrap">
+    <canvas id="smudge-canvas"></canvas>
+  </div>
+  <div class="smudge-controls">
+    <label>Radius</label>
+    <input type="range" min="15" max="60" value="30" id="smudge-radius">
+    <label>Strength</label>
+    <input type="range" min="10" max="90" value="55" id="smudge-strength">
+    <button class="smudge-btn" onclick="initSmudgeCanvas()">Reset</button>
+  </div>
+  <div class="smudge-hint">Click & drag to smudge — the effect stays</div>
+  <div class="code-btn-bottom"><button class="code-btn-glow" onclick="openCodeModal('smudge')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Get Code</button></div>
+</section>
+
+<!-- HOVER SMUDGE -->
+<section class="hsmudge-section" id="hsmudge" onmousemove="handleHSmudgeCursor(event)">
+  <div class="hsmudge-cursor" id="hsmudge-cursor"></div>
+  <div class="section-label">09 — Experiment</div>
+  <div class="hsmudge-canvas-wrap">
+    <canvas id="hsmudge-canvas"></canvas>
+  </div>
+  <div class="hsmudge-hint">Hover to deform — leave to recover</div>
+  <div class="code-btn-bottom"><button class="code-btn-glow" onclick="openCodeModal('hsmudge')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Get Code</button></div>
+</section>
+
+<!-- DRAW -->
+<section class="draw-section" id="draw">
+  <div class="section-label">10 — Experiment</div>
+  <h2 class="section-title">Freehand<br>Draw</h2>
+  <p class="desc">Click and drag to draw freely on the canvas. Change brush tip, size, opacity and color in real time.</p>
+  <p class="desc-es">Haz click sostenido y arrastra para dibujar libremente. Cambia punta, grosor, opacidad y color en tiempo real.</p>
+  <div class="draw-toolbar">
+    <div class="draw-tool-group">
+      <label>Tip</label>
+      <button class="draw-tip-btn active" data-tip="round" onclick="setDrawTip('round',this)" title="Round">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="currentColor"/></svg>
+      </button>
+      <button class="draw-tip-btn" data-tip="flat" onclick="setDrawTip('flat',this)" title="Flat">
+        <svg viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="6" rx="1" fill="currentColor"/></svg>
+      </button>
+      <button class="draw-tip-btn" data-tip="spray" onclick="setDrawTip('spray',this)" title="Spray">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="8" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="10" cy="15" r="1" fill="currentColor"/><circle cx="14" cy="14" r="1.2" fill="currentColor"/><circle cx="9" cy="12" r="0.8" fill="currentColor"/><circle cx="16" cy="12" r="0.8" fill="currentColor"/></svg>
+      </button>
+      <button class="draw-tip-btn" data-tip="calligraphy" onclick="setDrawTip('calligraphy',this)" title="Calligraphy">
+        <svg viewBox="0 0 24 24"><line x1="6" y1="18" x2="18" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div style="width:1px;height:24px;background:#e0ddd8;"></div>
+    <div class="draw-tool-group">
+      <label>Size</label>
+      <input type="range" min="1" max="50" value="6" id="draw-size">
+    </div>
+    <div class="draw-tool-group">
+      <label>Opacity</label>
+      <input type="range" min="5" max="100" value="100" id="draw-opacity">
+    </div>
+    <div class="draw-tool-group">
+      <label>Color</label>
+      <input type="color" value="#1a1a1a" id="draw-color">
+    </div>
+    <div class="draw-tool-group">
+      <label>BG</label>
+      <input type="color" value="#f0ede8" id="draw-bg" oninput="clearDrawCanvas()">
+    </div>
+    <div style="width:1px;height:24px;background:#e0ddd8;"></div>
+    <button class="draw-action-btn" onclick="undoDraw()">Undo</button>
+    <button class="draw-action-btn" onclick="clearDrawCanvas()">Clear</button>
+    <button class="draw-action-btn" onclick="downloadDraw()">Save PNG</button>
+  </div>
+  <div class="draw-canvas-wrap">
+    <canvas id="draw-canvas"></canvas>
+  </div>
+  <div class="code-btn-bottom"><button class="code-btn-glow" onclick="openCodeModal('draw')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Get Code</button></div>
+</section>
+
+<!-- PARTICLE TRAIL -->
+<section class="particle-section" id="particles">
+  <div class="particle-canvas-wrap">
+    <canvas id="particle-canvas"></canvas>
+    <div class="particle-cursor" id="particle-cursor"></div>
+  </div>
+  <div class="section-label">11 — Experiment</div>
+  <h2 class="section-title">Shape<br>Emitter</h2>
+  <p class="desc">Click and drag to emit shapes that fade away. Choose a shape, tweak the trail, or upload your own SVG.</p>
+  <p class="desc-es">Haz clic y arrastra para emitir formas que se desvanecen. Elige una forma, ajusta el rastro o carga tu propio SVG.</p>
+  <div class="particle-toolbar">
+    <div class="draw-tool-group">
+      <label>Shape</label>
+      <button class="draw-tip-btn active" onclick="setParticleShape('circle',this)" title="Circle">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" fill="currentColor"/></svg>
+      </button>
+      <button class="draw-tip-btn" onclick="setParticleShape('square',this)" title="Square">
+        <svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2" fill="currentColor"/></svg>
+      </button>
+      <button class="draw-tip-btn" onclick="setParticleShape('triangle',this)" title="Triangle">
+        <svg viewBox="0 0 24 24"><polygon points="12,4 21,20 3,20" fill="currentColor"/></svg>
+      </button>
+      <button class="draw-tip-btn" onclick="setParticleShape('star',this)" title="Star">
+        <svg viewBox="0 0 24 24"><polygon points="12,2 15,9 22,9 16.5,14 18.5,21 12,17 5.5,21 7.5,14 2,9 9,9" fill="currentColor"/></svg>
+      </button>
+      <button class="draw-tip-btn" onclick="setParticleShape('organic',this)" title="Organic">
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="8" ry="6" fill="currentColor" transform="rotate(25 12 12)"/></svg>
+      </button>
+    </div>
+    <div class="sep"></div>
+    <div class="draw-tool-group">
+      <label>Size</label>
+      <input type="range" min="5" max="60" value="20" id="pt-size">
+    </div>
+    <div class="draw-tool-group">
+      <label>Rate</label>
+      <input type="range" min="1" max="15" value="5" id="pt-rate">
+    </div>
+    <div class="draw-tool-group">
+      <label>Life</label>
+      <input type="range" min="20" max="200" value="80" id="pt-life">
+    </div>
+    <div class="draw-tool-group">
+      <label>Color</label>
+      <input type="color" value="#ff4d00" id="pt-color">
+    </div>
+    <div class="draw-tool-group">
+      <label>Multi</label>
+      <input type="checkbox" id="pt-multi" style="accent-color:var(--accent);width:16px;height:16px;cursor:pointer;">
+    </div>
+    <div class="sep"></div>
+    <label class="svg-upload-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload SVG
+      <input type="file" accept=".svg" id="pt-svg-upload" onchange="handleSVGUpload(event)">
+    </label>
+    <span class="custom-svg-badge" id="pt-svg-badge">Custom SVG</span>
+    <div class="sep"></div>
+    <button class="draw-action-btn" onclick="clearParticleCanvas()">Clear</button>
+  </div>
+  <div class="code-btn-bottom"><button class="code-btn-glow" onclick="openCodeModal('particles')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Get Code</button></div>
+</section>
+
+<!-- MANIFESTO -->
+<section class="manifesto">
+  <h2>Every shape<br>tells a <em>story</em></h2>
+  <a href="#stroke" class="cta">Start Creating</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>PATO Labs — 2026</span>
+  <span>Organic Modules System</span>
+</footer>
+
+<!-- CODE MODAL -->
+<div class="code-modal-overlay" id="code-modal-overlay" onclick="if(event.target===this)closeCodeModal()">
+  <div class="code-modal">
+    <div class="code-modal-header">
+      <h3 id="code-modal-title">Code</h3>
+      <div class="modal-actions">
+        <button class="modal-copy-btn" id="modal-copy-btn" onclick="copyCode()">Copy</button>
+        <button class="modal-close-btn" onclick="closeCodeModal()">Close</button>
+      </div>
+    </div>
+    <div class="code-modal-tabs" id="code-modal-tabs"></div>
+    <div class="code-modal-body">
+      <pre id="code-modal-pre"></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+// STROKE
+function updateStroke() {
+  const section = document.querySelector('#stroke').closest('.prop-section');
+  const inputs = section.querySelectorAll('input');
+  const values = section.querySelectorAll('.value');
+  const shape = document.getElementById('stroke-shape');
+
+  const width = inputs[0].value;
+  const color = inputs[1].value;
+  const dash = inputs[2].value;
+
+  shape.style.borderWidth = width + 'px';
+  shape.style.borderColor = color;
+  shape.style.borderStyle = dash > 0 ? 'dashed' : 'solid';
+  if (dash > 0) {
+    shape.style.borderStyle = 'dashed';
+  }
+
+  values[0].textContent = width + 'px';
+  values[1].textContent = dash;
+}
+
+// FILL
+function updateFill() {
+  const section = document.querySelector('#fill').closest('.prop-section');
+  const inputs = section.querySelectorAll('input');
+  const values = section.querySelectorAll('.value');
+  const shape = document.getElementById('fill-shape');
+
+  const c1 = inputs[0].value;
+  const c2 = inputs[1].value;
+  const angle = inputs[2].value;
+
+  if (c1 === c2) {
+    shape.style.background = c1;
+  } else {
+    shape.style.background = `linear-gradient(${angle}deg, ${c1}, ${c2})`;
+  }
+  values[0].textContent = angle + '\u00B0';
+}
+
+// RADIUS
+function updateRadiusAll(val) {
+  const singles = document.querySelectorAll('.radius-single');
+  const section = document.querySelector('#radius').closest('.prop-section');
+  const values = section.querySelectorAll('.control-row:not(:first-child) .value');
+
+  singles.forEach((input, i) => {
+    input.value = val;
+    values[i].textContent = val + '%';
+  });
+  document.getElementById('radius-all-val').textContent = val + '%';
+  const shape = document.getElementById('radius-shape');
+  shape.style.borderRadius = `${val}% ${val}% ${val}% ${val}%`;
+}
+
+function updateRadius() {
+  const singles = document.querySelectorAll('.radius-single');
+  const section = document.querySelector('#radius').closest('.prop-section');
+  const values = section.querySelectorAll('.control-row:not(:first-child) .value');
+  const shape = document.getElementById('radius-shape');
+
+  const tl = singles[0].value;
+  const tr = singles[1].value;
+  const br = singles[2].value;
+  const bl = singles[3].value;
+
+  shape.style.borderRadius = `${tl}% ${tr}% ${br}% ${bl}%`;
+
+  values[0].textContent = tl + '%';
+  values[1].textContent = tr + '%';
+  values[2].textContent = br + '%';
+  values[3].textContent = bl + '%';
+}
+
+// OPACITY
+function updateOpacity() {
+  const section = document.querySelector('#opacity').closest('.prop-section');
+  const inputs = section.querySelectorAll('input');
+  const values = section.querySelectorAll('.value');
+  const shapeBg = document.getElementById('opacity-shape-bg');
+  const shape = document.getElementById('opacity-shape');
+
+  const op = inputs[0].value;
+  const bgColor = inputs[1].value;
+  const fgColor = inputs[2].value;
+
+  shape.style.opacity = op / 100;
+  shapeBg.style.background = bgColor;
+  shape.style.background = fgColor;
+
+  values[0].textContent = op + '%';
+}
+
+// LATTICE
+const latticeShapes = {
+  circles: () => '50%',
+  squares: () => '15%',
+  mixed: (i) => ['50%', '15%', '30% 70% 70% 30%/30% 30% 70% 70%'][i % 3],
+  organic: (i) => [
+    '30% 70% 70% 30%/30% 30% 70% 70%',
+    '58% 42% 75% 25%/76% 46% 54% 24%',
+    '50% 50% 33% 67%/55% 27% 73% 45%',
+    '33% 67% 58% 42%/63% 68% 32% 37%'
+  ][i % 4]
+};
+let latticePreset = 'circles';
+
+function rebuildLattice() {
+  const grid = document.getElementById('lattice-grid');
+  const cols = parseInt(document.getElementById('lat-cols').value);
+  const total = cols * cols;
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  grid.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'lattice-cell';
+    grid.appendChild(cell);
+  }
+  updateLattice();
+}
+
+function updateLattice() {
+  const blur = document.getElementById('lat-blur').value;
+  const color = document.getElementById('lat-color').value;
+  const size = document.getElementById('lat-size').value;
+  const gap = document.getElementById('lat-gap').value;
+  const opacity = document.getElementById('lat-opacity').value;
+  const grid = document.getElementById('lattice-grid');
+  const cells = grid.querySelectorAll('.lattice-cell');
+
+  grid.style.gap = gap + 'px';
+
+  // Parse hex to RGB for variations
+  const r = parseInt(color.slice(1,3), 16);
+  const g = parseInt(color.slice(3,5), 16);
+  const b = parseInt(color.slice(5,7), 16);
+
+  cells.forEach((cell, i) => {
+    cell.style.borderRadius = latticeShapes[latticePreset](i);
+    // Color variation per cell
+    const hueShift = (i * 12) % 60 - 30;
+    const rr = Math.min(255, Math.max(0, r + hueShift));
+    const gg = Math.min(255, Math.max(0, g + hueShift * 0.5));
+    const bb = Math.min(255, Math.max(0, b - hueShift * 0.3));
+    cell.style.background = `rgb(${Math.round(rr)},${Math.round(gg)},${Math.round(bb)})`;
+    cell.style.filter = `blur(${blur}px)`;
+    cell.style.transform = `scale(${size / 100})`;
+    const cellOp = (parseFloat(opacity) / 100) * (0.5 + (i % 4) * 0.17);
+    cell.style.opacity = Math.min(1, cellOp).toFixed(2);
+  });
+}
+
+function setLatticePreset(preset, btn) {
+  latticePreset = preset;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateLattice();
+}
+
+rebuildLattice();
+
+// LIQUIFY
+let liquifyAnim = null;
+let liquifyTarget = 0;
+let liquifyCurrent = 0;
+
+function handleLiquify(e) {
+  const section = document.querySelector('.liquify-section');
+  const rect = section.getBoundingClientRect();
+  const cursor = document.getElementById('liquify-cursor');
+  const turb = document.getElementById('liquify-turb');
+  const disp = document.getElementById('liquify-disp');
+
+  // Move custom cursor
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+
+  // Calculate distance from center of section
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const dx = (e.clientX - cx) / rect.width;
+  const dy = (e.clientY - cy) / rect.height;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+
+  // Proximity to text area — stronger when closer
+  const relY = (e.clientY - rect.top) / rect.height;
+  const inTextZone = relY > 0.2 && relY < 0.8;
+  const intensity = inTextZone ? 1 : 0.3;
+
+  // Update turbulence based on mouse position
+  const freqX = 0.008 + Math.abs(dx) * 0.04;
+  const freqY = 0.008 + Math.abs(dy) * 0.04;
+  turb.setAttribute('baseFrequency', `${freqX.toFixed(4)} ${freqY.toFixed(4)}`);
+
+  // Target displacement scale
+  liquifyTarget = (30 + dist * 80) * intensity;
+
+  // Animate smoothly
+  if (!liquifyAnim) {
+    liquifyAnim = requestAnimationFrame(animateLiquify);
+  }
+}
+
+function animateLiquify() {
+  const disp = document.getElementById('liquify-disp');
+  liquifyCurrent += (liquifyTarget - liquifyCurrent) * 0.12;
+
+  if (Math.abs(liquifyCurrent - liquifyTarget) < 0.5 && liquifyTarget === 0) {
+    liquifyCurrent = 0;
+    disp.setAttribute('scale', '0');
+    liquifyAnim = null;
+    return;
+  }
+
+  disp.setAttribute('scale', liquifyCurrent.toFixed(1));
+  liquifyAnim = requestAnimationFrame(animateLiquify);
+}
+
+function resetLiquify() {
+  liquifyTarget = 0;
+  if (!liquifyAnim) {
+    liquifyAnim = requestAnimationFrame(animateLiquify);
+  }
+}
+
+// MAGNET — Init: split text into chars
+(function initMagnet() {
+  const lines = document.querySelectorAll('.magnet-line');
+  lines.forEach(line => {
+    const text = line.getAttribute('data-text');
+    const isAccent = line.hasAttribute('data-accent');
+    line.innerHTML = '';
+    for (let i = 0; i < text.length; i++) {
+      const span = document.createElement('span');
+      span.className = 'magnet-char' + (isAccent ? ' accent' : '');
+      if (text[i] === ' ') {
+        span.className += ' space';
+        span.innerHTML = '&nbsp;';
+      } else {
+        span.textContent = text[i];
+      }
+      line.appendChild(span);
+    }
+  });
+})();
+
+const MAGNET_RADIUS = 120;
+const MAGNET_STRENGTH = 22;
+const MAGNET_BLUR_MAX = 3.5;
+let magnetChars = null;
+let magnetRAF = null;
+let magnetMouse = { x: -9999, y: -9999 };
+let magnetActive = false;
+
+function handleMagnet(e) {
+  const cursor = document.getElementById('magnet-cursor');
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+  magnetMouse.x = e.clientX;
+  magnetMouse.y = e.clientY;
+  magnetActive = true;
+
+  if (!magnetChars) {
+    magnetChars = document.querySelectorAll('.magnet-char');
+  }
+  if (!magnetRAF) {
+    magnetRAF = requestAnimationFrame(updateMagnet);
+  }
+}
+
+function updateMagnet() {
+  if (!magnetChars) { magnetRAF = null; return; }
+
+  let anyAffected = false;
+
+  magnetChars.forEach(ch => {
+    const rect = ch.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    const dx = cx - magnetMouse.x;
+    const dy = cy - magnetMouse.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < MAGNET_RADIUS) {
+      anyAffected = true;
+      // Smooth falloff: 1 at center → 0 at edge (cubic easing)
+      const t = 1 - (dist / MAGNET_RADIUS);
+      const ease = t * t * t;
+
+      // Push away radially from cursor
+      const angle = Math.atan2(dy, dx);
+      const pushX = Math.cos(angle) * MAGNET_STRENGTH * ease;
+      const pushY = Math.sin(angle) * MAGNET_STRENGTH * ease;
+      const blur = MAGNET_BLUR_MAX * ease;
+      const scale = 1 + ease * 0.12;
+
+      ch.style.transform = `translate(${pushX.toFixed(1)}px, ${pushY.toFixed(1)}px) scale(${scale.toFixed(3)})`;
+      ch.style.filter = `blur(${blur.toFixed(1)}px)`;
+    } else {
+      ch.style.transform = '';
+      ch.style.filter = '';
+    }
+  });
+
+  if (magnetActive || anyAffected) {
+    magnetRAF = requestAnimationFrame(updateMagnet);
+  } else {
+    magnetRAF = null;
+  }
+}
+
+function resetMagnet() {
+  magnetActive = false;
+  magnetMouse.x = -9999;
+  magnetMouse.y = -9999;
+  // Let one more frame run to reset all chars
+  if (!magnetRAF) {
+    magnetRAF = requestAnimationFrame(updateMagnet);
+  }
+}
+
+// SMUDGE CANVAS
+const smudgeCanvas = document.getElementById('smudge-canvas');
+const smudgeCtx = smudgeCanvas.getContext('2d', { willReadFrequently: true });
+let smudgePainting = false;
+let smudgePrev = null;
+
+function initSmudgeCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.min(window.innerWidth - 80, 1000);
+  const h = Math.min(window.innerHeight * 0.55, 500);
+  smudgeCanvas.style.width = w + 'px';
+  smudgeCanvas.style.height = h + 'px';
+  smudgeCanvas.width = w * dpr;
+  smudgeCanvas.height = h * dpr;
+  smudgeCtx.scale(dpr, dpr);
+
+  // Dark background
+  smudgeCtx.fillStyle = '#1a1a1a';
+  smudgeCtx.fillRect(0, 0, w, h);
+
+  // Draw text
+  smudgeCtx.textAlign = 'center';
+  smudgeCtx.textBaseline = 'middle';
+
+  // Line 1 — large italic accent
+  const bigSize = Math.min(w * 0.18, 140);
+  smudgeCtx.font = `900 italic ${bigSize}px Inter, sans-serif`;
+  smudgeCtx.fillStyle = '#ff4d00';
+  smudgeCtx.fillText('Smudge', w / 2, h * 0.3);
+
+  // Line 2 — large white
+  smudgeCtx.font = `900 ${bigSize * 0.85}px Inter, sans-serif`;
+  smudgeCtx.fillStyle = '#ffffff';
+  smudgeCtx.fillText('& Destroy', w / 2, h * 0.55);
+
+  // Line 3 — smaller muted
+  const smallSize = Math.min(w * 0.05, 40);
+  smudgeCtx.font = `600 ${smallSize}px Inter, sans-serif`;
+  smudgeCtx.fillStyle = 'rgba(255,255,255,0.3)';
+  smudgeCtx.letterSpacing = '0.2em';
+  smudgeCtx.fillText('THE EFFECT STAYS', w / 2, h * 0.78);
+
+  smudgeCtx.setTransform(1, 0, 0, 1, 0, 0);
+  smudgePrev = null;
+}
+
+function smudge(x, y, prevX, prevY) {
+  const dpr = window.devicePixelRatio || 1;
+  const radius = parseInt(document.getElementById('smudge-radius').value);
+  const strength = parseInt(document.getElementById('smudge-strength').value) / 100;
+
+  const cx = x * dpr;
+  const cy = y * dpr;
+  const r = radius * dpr;
+
+  // Direction of smudge
+  const dx = (x - prevX);
+  const dy = (y - prevY);
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist < 1) return;
+
+  const ndx = (dx / dist) * strength;
+  const ndy = (dy / dist) * strength;
+
+  // Read the area we'll smudge into
+  const sx = Math.max(0, Math.floor(cx - r));
+  const sy = Math.max(0, Math.floor(cy - r));
+  const sw = Math.min(smudgeCanvas.width - sx, Math.ceil(r * 2));
+  const sh = Math.min(smudgeCanvas.height - sy, Math.ceil(r * 2));
+  if (sw <= 0 || sh <= 0) return;
+
+  const imageData = smudgeCtx.getImageData(sx, sy, sw, sh);
+  const data = imageData.data;
+
+  // Create a copy to sample from
+  const srcData = new Uint8ClampedArray(data);
+
+  for (let py = 0; py < sh; py++) {
+    for (let px = 0; px < sw; px++) {
+      const ax = px + sx - cx;
+      const ay = py + sy - cy;
+      const d = Math.sqrt(ax * ax + ay * ay);
+
+      if (d > r) continue;
+
+      // Smooth falloff
+      const t = 1 - (d / r);
+      const falloff = t * t * (3 - 2 * t); // smoothstep
+
+      // Sample from offset position (where the pixel "came from")
+      const srcX = Math.round(px - ndx * falloff * r * 0.3);
+      const srcY = Math.round(py - ndy * falloff * r * 0.3);
+
+      if (srcX < 0 || srcX >= sw || srcY < 0 || srcY >= sh) continue;
+
+      const dstIdx = (py * sw + px) * 4;
+      const srcIdx = (srcY * sw + srcX) * 4;
+      const mix = falloff * strength;
+
+      data[dstIdx]     = data[dstIdx]     + (srcData[srcIdx]     - data[dstIdx])     * mix;
+      data[dstIdx + 1] = data[dstIdx + 1] + (srcData[srcIdx + 1] - data[dstIdx + 1]) * mix;
+      data[dstIdx + 2] = data[dstIdx + 2] + (srcData[srcIdx + 2] - data[dstIdx + 2]) * mix;
+      data[dstIdx + 3] = data[dstIdx + 3] + (srcData[srcIdx + 3] - data[dstIdx + 3]) * mix;
+    }
+  }
+
+  smudgeCtx.putImageData(imageData, sx, sy);
+}
+
+function handleSmudgeCursor(e) {
+  const cursor = document.getElementById('smudge-cursor');
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+  const r = document.getElementById('smudge-radius').value;
+  cursor.style.width = (r * 2) + 'px';
+  cursor.style.height = (r * 2) + 'px';
+}
+
+smudgeCanvas.addEventListener('mousedown', (e) => {
+  smudgePainting = true;
+  const rect = smudgeCanvas.getBoundingClientRect();
+  smudgePrev = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+});
+
+smudgeCanvas.addEventListener('mousemove', (e) => {
+  if (!smudgePainting || !smudgePrev) return;
+  const rect = smudgeCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  smudge(x, y, smudgePrev.x, smudgePrev.y);
+  smudgePrev = { x, y };
+});
+
+smudgeCanvas.addEventListener('mouseup', () => { smudgePainting = false; smudgePrev = null; });
+smudgeCanvas.addEventListener('mouseleave', () => { smudgePainting = false; smudgePrev = null; });
+
+// Init on load and resize
+initSmudgeCanvas();
+window.addEventListener('resize', initSmudgeCanvas);
+
+// HOVER SMUDGE — deforms on hover, recovers on leave
+const hsmudgeCanvas = document.getElementById('hsmudge-canvas');
+const hsmudgeCtx = hsmudgeCanvas.getContext('2d', { willReadFrequently: true });
+let hsmudgePrev = null;
+let hOriginalData = null;
+let hRecoveryRAF = null;
+let hIsHovering = false;
+let hRecoveryFrame = 0;
+const H_RADIUS = 55;
+const H_STRENGTH = 0.6;
+
+function initHSmudgeCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.min(window.innerWidth - 80, 1000);
+  const h = Math.min(window.innerHeight * 0.55, 500);
+  hsmudgeCanvas.style.width = w + 'px';
+  hsmudgeCanvas.style.height = h + 'px';
+  hsmudgeCanvas.width = w * dpr;
+  hsmudgeCanvas.height = h * dpr;
+  hsmudgeCtx.scale(dpr, dpr);
+
+  hsmudgeCtx.fillStyle = '#f0ede8';
+  hsmudgeCtx.fillRect(0, 0, w, h);
+
+  const bigSize = Math.min(w * 0.17, 130);
+  hsmudgeCtx.textAlign = 'center';
+  hsmudgeCtx.textBaseline = 'middle';
+
+  hsmudgeCtx.font = `900 ${bigSize}px Inter, sans-serif`;
+  hsmudgeCtx.fillStyle = '#1a1a1a';
+  hsmudgeCtx.fillText('Melt', w / 2, h * 0.28);
+
+  hsmudgeCtx.font = `900 italic ${bigSize}px Inter, sans-serif`;
+  hsmudgeCtx.fillStyle = '#ff4d00';
+  hsmudgeCtx.fillText('& Distort', w / 2, h * 0.52);
+
+  const smallSize = Math.min(w * 0.045, 36);
+  hsmudgeCtx.font = `600 ${smallSize}px Inter, sans-serif`;
+  hsmudgeCtx.fillStyle = '#8a8578';
+  hsmudgeCtx.fillText('HOVER TO DISTORT', w / 2, h * 0.76);
+
+  hsmudgeCtx.setTransform(1, 0, 0, 1, 0, 0);
+
+  // Store original state
+  hOriginalData = hsmudgeCtx.getImageData(0, 0, hsmudgeCanvas.width, hsmudgeCanvas.height);
+  hsmudgePrev = null;
+}
+
+function hsmudge(x, y, prevX, prevY) {
+  const dpr = window.devicePixelRatio || 1;
+  const cx = x * dpr;
+  const cy = y * dpr;
+  const r = H_RADIUS * dpr;
+
+  const dx = (x - prevX);
+  const dy = (y - prevY);
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist < 1) return;
+
+  const ndx = (dx / dist) * H_STRENGTH;
+  const ndy = (dy / dist) * H_STRENGTH;
+
+  const sx = Math.max(0, Math.floor(cx - r));
+  const sy = Math.max(0, Math.floor(cy - r));
+  const sw = Math.min(hsmudgeCanvas.width - sx, Math.ceil(r * 2));
+  const sh = Math.min(hsmudgeCanvas.height - sy, Math.ceil(r * 2));
+  if (sw <= 0 || sh <= 0) return;
+
+  const imageData = hsmudgeCtx.getImageData(sx, sy, sw, sh);
+  const data = imageData.data;
+  const srcData = new Uint8ClampedArray(data);
+
+  for (let py = 0; py < sh; py++) {
+    for (let px = 0; px < sw; px++) {
+      const ax = px + sx - cx;
+      const ay = py + sy - cy;
+      const d = Math.sqrt(ax * ax + ay * ay);
+      if (d > r) continue;
+
+      const t = 1 - (d / r);
+      const falloff = t * t * (3 - 2 * t);
+
+      const srcX = Math.round(px - ndx * falloff * r * 0.5);
+      const srcY = Math.round(py - ndy * falloff * r * 0.5);
+      if (srcX < 0 || srcX >= sw || srcY < 0 || srcY >= sh) continue;
+
+      const dstIdx = (py * sw + px) * 4;
+      const srcIdx = (srcY * sw + srcX) * 4;
+      const mix = falloff * H_STRENGTH;
+
+      data[dstIdx]     += (srcData[srcIdx]     - data[dstIdx])     * mix;
+      data[dstIdx + 1] += (srcData[srcIdx + 1] - data[dstIdx + 1]) * mix;
+      data[dstIdx + 2] += (srcData[srcIdx + 2] - data[dstIdx + 2]) * mix;
+      data[dstIdx + 3] += (srcData[srcIdx + 3] - data[dstIdx + 3]) * mix;
+    }
+  }
+
+  hsmudgeCtx.putImageData(imageData, sx, sy);
+}
+
+// Recovery animation — starts slow, accelerates over time
+function recoverHSmudge() {
+  if (hIsHovering) { hRecoveryRAF = null; return; }
+  if (!hOriginalData) { hRecoveryRAF = null; return; }
+
+  hRecoveryFrame++;
+
+  const current = hsmudgeCtx.getImageData(0, 0, hsmudgeCanvas.width, hsmudgeCanvas.height);
+  const cur = current.data;
+  const orig = hOriginalData.data;
+  let maxDiff = 0;
+
+  // Accelerating blend: starts at 0.02, ramps up to ~0.25
+  const t = Math.min(hRecoveryFrame / 80, 1);
+  const blendSpeed = 0.02 + t * t * 0.23;
+
+  for (let i = 0; i < cur.length; i++) {
+    const diff = orig[i] - cur[i];
+    cur[i] = cur[i] + diff * blendSpeed;
+    if (Math.abs(diff) > maxDiff) maxDiff = Math.abs(diff);
+  }
+
+  hsmudgeCtx.putImageData(current, 0, 0);
+
+  if (maxDiff > 0.8) {
+    hRecoveryRAF = requestAnimationFrame(recoverHSmudge);
+  } else {
+    hsmudgeCtx.putImageData(hOriginalData, 0, 0);
+    hRecoveryRAF = null;
+  }
+}
+
+function handleHSmudgeCursor(e) {
+  const cursor = document.getElementById('hsmudge-cursor');
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+}
+
+// Hover triggers smudge
+hsmudgeCanvas.addEventListener('mouseenter', () => {
+  hIsHovering = true;
+  hRecoveryFrame = 0;
+  if (hRecoveryRAF) {
+    cancelAnimationFrame(hRecoveryRAF);
+    hRecoveryRAF = null;
+  }
+});
+
+hsmudgeCanvas.addEventListener('mousemove', (e) => {
+  const rect = hsmudgeCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  if (hsmudgePrev) {
+    hsmudge(x, y, hsmudgePrev.x, hsmudgePrev.y);
+  }
+  hsmudgePrev = { x, y };
+});
+
+hsmudgeCanvas.addEventListener('mouseleave', () => {
+  hIsHovering = false;
+  hsmudgePrev = null;
+  hRecoveryFrame = 0;
+  // Start smooth recovery
+  if (!hRecoveryRAF) {
+    hRecoveryRAF = requestAnimationFrame(recoverHSmudge);
+  }
+});
+
+initHSmudgeCanvas();
+window.addEventListener('resize', initHSmudgeCanvas);
+
+// DRAW CANVAS
+const drawCanvas = document.getElementById('draw-canvas');
+const drawCtx = drawCanvas.getContext('2d');
+let drawing = false;
+let drawPrev = null;
+let drawTip = 'round';
+let drawHistory = [];
+const DRAW_MAX_UNDO = 30;
+
+function initDrawCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.min(window.innerWidth - 80, 1000);
+  const h = Math.min(window.innerHeight * 0.5, 480);
+  drawCanvas.style.width = w + 'px';
+  drawCanvas.style.height = h + 'px';
+  drawCanvas.width = w * dpr;
+  drawCanvas.height = h * dpr;
+  drawCtx.scale(dpr, dpr);
+  clearDrawCanvas();
+}
+
+function clearDrawCanvas() {
+  const w = parseInt(drawCanvas.style.width);
+  const h = parseInt(drawCanvas.style.height);
+  const bg = document.getElementById('draw-bg').value;
+  drawCtx.setTransform(1, 0, 0, 1, 0, 0);
+  const dpr = window.devicePixelRatio || 1;
+  drawCtx.scale(dpr, dpr);
+  drawCtx.fillStyle = bg;
+  drawCtx.fillRect(0, 0, w, h);
+  drawHistory = [];
+  saveDrawState();
+}
+
+function saveDrawState() {
+  if (drawHistory.length >= DRAW_MAX_UNDO) drawHistory.shift();
+  drawHistory.push(drawCtx.getImageData(0, 0, drawCanvas.width, drawCanvas.height));
+}
+
+function undoDraw() {
+  if (drawHistory.length > 1) {
+    drawHistory.pop();
+    drawCtx.putImageData(drawHistory[drawHistory.length - 1], 0, 0);
+  }
+}
+
+function downloadDraw() {
+  const link = document.createElement('a');
+  link.download = 'drawing.png';
+  link.href = drawCanvas.toDataURL('image/png');
+  link.click();
+}
+
+function setDrawTip(tip, btn) {
+  drawTip = tip;
+  document.querySelectorAll('.draw-tip-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function drawStroke(x, y, px, py) {
+  const size = parseInt(document.getElementById('draw-size').value);
+  const opacity = parseInt(document.getElementById('draw-opacity').value) / 100;
+  const color = document.getElementById('draw-color').value;
+
+  // Parse color to rgba
+  const r = parseInt(color.slice(1,3), 16);
+  const g = parseInt(color.slice(3,5), 16);
+  const b = parseInt(color.slice(5,7), 16);
+
+  drawCtx.save();
+
+  if (drawTip === 'round') {
+    drawCtx.globalAlpha = opacity;
+    drawCtx.strokeStyle = color;
+    drawCtx.lineWidth = size;
+    drawCtx.lineCap = 'round';
+    drawCtx.lineJoin = 'round';
+    drawCtx.beginPath();
+    drawCtx.moveTo(px, py);
+    drawCtx.lineTo(x, y);
+    drawCtx.stroke();
+  }
+  else if (drawTip === 'flat') {
+    drawCtx.globalAlpha = opacity;
+    drawCtx.strokeStyle = color;
+    drawCtx.lineWidth = size * 0.3;
+    drawCtx.lineCap = 'butt';
+    const dx = x - px, dy = y - py;
+    const angle = Math.atan2(dy, dx);
+    // Flat brush perpendicular to stroke direction
+    const perpX = Math.cos(angle + Math.PI/2) * size * 0.5;
+    const perpY = Math.sin(angle + Math.PI/2) * size * 0.5;
+    drawCtx.beginPath();
+    drawCtx.moveTo(px - perpX, py - perpY);
+    drawCtx.lineTo(px + perpX, py + perpY);
+    drawCtx.lineTo(x + perpX, y + perpY);
+    drawCtx.lineTo(x - perpX, y - perpY);
+    drawCtx.closePath();
+    drawCtx.fillStyle = `rgba(${r},${g},${b},${opacity})`;
+    drawCtx.fill();
+  }
+  else if (drawTip === 'spray') {
+    const density = Math.floor(size * 2);
+    for (let i = 0; i < density; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = Math.random() * size;
+      const sx = x + Math.cos(angle) * radius;
+      const sy = y + Math.sin(angle) * radius;
+      const dotSize = 0.5 + Math.random() * 1.5;
+      drawCtx.globalAlpha = opacity * (0.2 + Math.random() * 0.6);
+      drawCtx.fillStyle = color;
+      drawCtx.beginPath();
+      drawCtx.arc(sx, sy, dotSize, 0, Math.PI * 2);
+      drawCtx.fill();
+    }
+  }
+  else if (drawTip === 'calligraphy') {
+    drawCtx.globalAlpha = opacity;
+    const dx = x - px, dy = y - py;
+    const speed = Math.sqrt(dx*dx + dy*dy);
+    // Width varies with speed and angle
+    const angle = Math.atan2(dy, dx);
+    const widthFactor = Math.abs(Math.sin(angle - Math.PI/4));
+    const w = Math.max(1, size * (0.15 + widthFactor * 0.85));
+    drawCtx.strokeStyle = color;
+    drawCtx.lineWidth = w;
+    drawCtx.lineCap = 'round';
+    drawCtx.lineJoin = 'round';
+    drawCtx.beginPath();
+    drawCtx.moveTo(px, py);
+    // Slight curve for natural feel
+    const mx = (px + x) / 2;
+    const my = (py + y) / 2;
+    drawCtx.quadraticCurveTo(px, py, mx, my);
+    drawCtx.quadraticCurveTo(x, y, x, y);
+    drawCtx.stroke();
+  }
+
+  drawCtx.restore();
+}
+
+drawCanvas.addEventListener('mousedown', (e) => {
+  drawing = true;
+  const rect = drawCanvas.getBoundingClientRect();
+  drawPrev = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  // Draw a single dot
+  drawStroke(drawPrev.x, drawPrev.y, drawPrev.x, drawPrev.y);
+});
+
+drawCanvas.addEventListener('mousemove', (e) => {
+  if (!drawing || !drawPrev) return;
+  const rect = drawCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  drawStroke(x, y, drawPrev.x, drawPrev.y);
+  drawPrev = { x, y };
+});
+
+drawCanvas.addEventListener('mouseup', () => {
+  if (drawing) saveDrawState();
+  drawing = false;
+  drawPrev = null;
+});
+
+drawCanvas.addEventListener('mouseleave', () => {
+  if (drawing) saveDrawState();
+  drawing = false;
+  drawPrev = null;
+});
+
+initDrawCanvas();
+window.addEventListener('resize', () => {
+  const imgData = drawCtx.getImageData(0, 0, drawCanvas.width, drawCanvas.height);
+  initDrawCanvas();
+});
+
+// ====== PARTICLE / SHAPE EMITTER ======
+const ptCanvas = document.getElementById('particle-canvas');
+const ptCtx = ptCanvas.getContext('2d');
+const ptCursor = document.getElementById('particle-cursor');
+let particles = [];
+let ptShape = 'circle';
+let ptSvgImg = null;
+let ptAnimId = null;
+let ptMouseDown = false;
+let ptMouse = { x: -999, y: -999 };
+
+const ptSection = document.getElementById('particles');
+
+function initParticleCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const w = ptSection.clientWidth;
+  const h = ptSection.clientHeight;
+  ptCanvas.width = w * dpr;
+  ptCanvas.height = h * dpr;
+  ptCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+class Particle {
+  constructor(x, y, shape, color, size, life, svgImg) {
+    this.x = x;
+    this.y = y;
+    this.shape = shape;
+    this.color = color;
+    this.size = size + Math.random() * size * 0.5;
+    this.maxLife = life;
+    this.life = life;
+    this.vx = (Math.random() - 0.5) * 2.5;
+    this.vy = (Math.random() - 0.5) * 2.5 - 1;
+    this.rotation = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.08;
+    this.svgImg = svgImg;
+  }
+
+  update() {
+    this.life--;
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vy += 0.02;
+    this.rotation += this.rotSpeed;
+    this.vx *= 0.995;
+  }
+
+  get opacity() {
+    return Math.max(0, this.life / this.maxLife);
+  }
+
+  draw(ctx) {
+    const o = this.opacity;
+    if (o <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = o;
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    const s = this.size;
+
+    if (this.svgImg) {
+      ctx.drawImage(this.svgImg, -s/2, -s/2, s, s);
+    } else {
+      ctx.fillStyle = this.color;
+      switch (this.shape) {
+        case 'circle':
+          ctx.beginPath();
+          ctx.arc(0, 0, s/2, 0, Math.PI*2);
+          ctx.fill();
+          break;
+        case 'square':
+          ctx.fillRect(-s/2, -s/2, s, s);
+          break;
+        case 'triangle':
+          ctx.beginPath();
+          ctx.moveTo(0, -s/2);
+          ctx.lineTo(s/2, s/2);
+          ctx.lineTo(-s/2, s/2);
+          ctx.closePath();
+          ctx.fill();
+          break;
+        case 'star':
+          ctx.beginPath();
+          for (let i = 0; i < 5; i++) {
+            const a = (i * 4 * Math.PI / 5) - Math.PI/2;
+            const r = i === 0 ? s/2 : s/2;
+            ctx[i === 0 ? 'moveTo' : 'lineTo'](Math.cos(a) * s/2, Math.sin(a) * s/2);
+            const b = a + 2 * Math.PI / 5;
+            ctx.lineTo(Math.cos(b) * s/4.5, Math.sin(b) * s/4.5);
+          }
+          ctx.closePath();
+          ctx.fill();
+          break;
+        case 'organic':
+          ctx.beginPath();
+          const pts = 6;
+          for (let i = 0; i <= pts; i++) {
+            const angle = (i / pts) * Math.PI * 2;
+            const r = s/2 * (0.7 + 0.3 * Math.sin(angle * 3 + this.rotation));
+            const px = Math.cos(angle) * r;
+            const py = Math.sin(angle) * r;
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.fill();
+          break;
+      }
+    }
+    ctx.restore();
+  }
+}
+
+function spawnParticles(x, y) {
+  const size = parseInt(document.getElementById('pt-size').value);
+  const rate = parseInt(document.getElementById('pt-rate').value);
+  const life = parseInt(document.getElementById('pt-life').value);
+  const baseColor = document.getElementById('pt-color').value;
+  const multiColor = document.getElementById('pt-multi').checked;
+
+  for (let i = 0; i < rate; i++) {
+    let color = baseColor;
+    if (multiColor) {
+      const hue = Math.random() * 360;
+      color = `hsl(${hue}, 75%, 55%)`;
+    }
+    const shape = ptSvgImg ? 'svg' : ptShape;
+    particles.push(new Particle(
+      x + (Math.random() - 0.5) * 20,
+      y + (Math.random() - 0.5) * 20,
+      shape, color, size, life, ptSvgImg
+    ));
+  }
+  if (particles.length > 2000) particles.splice(0, particles.length - 2000);
+}
+
+function animateParticles() {
+  const w = ptSection.clientWidth;
+  const h = ptSection.clientHeight;
+  ptCtx.clearRect(0, 0, w, h);
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    particles[i].update();
+    particles[i].draw(ptCtx);
+    if (particles[i].life <= 0) particles.splice(i, 1);
+  }
+
+  ptAnimId = requestAnimationFrame(animateParticles);
+}
+
+function setParticleShape(shape, btn) {
+  ptShape = shape;
+  ptSvgImg = null;
+  document.getElementById('pt-svg-badge').style.display = 'none';
+  document.querySelectorAll('.particle-toolbar .draw-tip-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function handleSVGUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    const blob = new Blob([e.target.result], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    img.onload = function() {
+      ptSvgImg = img;
+      document.getElementById('pt-svg-badge').style.display = 'inline-block';
+      document.querySelectorAll('.particle-toolbar .draw-tip-btn').forEach(b => b.classList.remove('active'));
+    };
+    img.src = url;
+  };
+  reader.readAsText(file);
+}
+
+function clearParticleCanvas() {
+  particles = [];
+  ptCtx.clearRect(0, 0, ptSection.clientWidth, ptSection.clientHeight);
+}
+
+function handleParticleCursor(event) {
+  const rect = ptSection.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  ptCursor.style.left = event.clientX + 'px';
+  ptCursor.style.top = event.clientY + 'px';
+  ptMouse = { x, y };
+  if (ptMouseDown) spawnParticles(x, y);
+}
+
+ptSection.addEventListener('mousedown', (e) => {
+  ptMouseDown = true;
+  const rect = ptSection.getBoundingClientRect();
+  spawnParticles(e.clientX - rect.left, e.clientY - rect.top);
+});
+
+ptSection.addEventListener('mousemove', (e) => {
+  handleParticleCursor(e);
+});
+
+window.addEventListener('mouseup', () => { ptMouseDown = false; });
+
+initParticleCanvas();
+window.addEventListener('resize', initParticleCanvas);
+animateParticles();
+
+// CODE MODAL SYSTEM
+const codeSnippets = {
+  stroke: {
+    title: 'Stroke Control',
+    tabs: {
+      HTML: `<div class="shape"
+  style="width:140px; height:140px;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    background: transparent;
+    border: 3px solid #1a1a1a;">
+</div>
+
+<input type="range" min="1" max="20" value="3" oninput="updateStroke()">
+<input type="color" value="#1a1a1a" oninput="updateStroke()">`,
+      JS: `function updateStroke() {
+  const shape = document.querySelector('.shape');
+  const width = document.querySelector('input[type=range]').value;
+  const color = document.querySelector('input[type=color]').value;
+
+  shape.style.borderWidth = width + 'px';
+  shape.style.borderColor = color;
+}`
+    }
+  },
+  fill: {
+    title: 'Fill & Gradient Control',
+    tabs: {
+      HTML: `<div class="shape"
+  style="width:160px; height:160px;
+    border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%;
+    background: #ff4d00;">
+</div>
+
+<input type="color" id="c1" value="#ff4d00">
+<input type="color" id="c2" value="#ff4d00">
+<input type="range" id="angle" min="0" max="360" value="135">`,
+      JS: `function updateFill() {
+  const shape = document.querySelector('.shape');
+  const c1 = document.getElementById('c1').value;
+  const c2 = document.getElementById('c2').value;
+  const angle = document.getElementById('angle').value;
+
+  if (c1 === c2) {
+    shape.style.background = c1;
+  } else {
+    shape.style.background =
+      \`linear-gradient(\${angle}deg, \${c1}, \${c2})\`;
+  }
+}`
+    }
+  },
+  radius: {
+    title: 'Corner Radius Control',
+    tabs: {
+      HTML: `<div class="shape"
+  style="width:150px; height:150px;
+    background: #1a1a1a;
+    border-radius: 0;
+    transition: border-radius 0.4s cubic-bezier(0.22,1,0.36,1);">
+</div>
+
+<!-- "All" slider + 4 individual sliders -->
+<input type="range" id="all" min="0" max="50" value="0">
+<input type="range" class="corner" min="0" max="50" value="0"> <!-- TL -->
+<input type="range" class="corner" min="0" max="50" value="0"> <!-- TR -->
+<input type="range" class="corner" min="0" max="50" value="0"> <!-- BR -->
+<input type="range" class="corner" min="0" max="50" value="0"> <!-- BL -->`,
+      JS: `// "All" slider sets all 4 corners at once
+document.getElementById('all').oninput = function() {
+  document.querySelectorAll('.corner').forEach(c => c.value = this.value);
+  updateRadius();
+};
+
+function updateRadius() {
+  const corners = document.querySelectorAll('.corner');
+  const shape = document.querySelector('.shape');
+  const [tl, tr, br, bl] = [...corners].map(c => c.value);
+  shape.style.borderRadius =
+    \`\${tl}% \${tr}% \${br}% \${bl}%\`;
+}`
+    }
+  },
+  opacity: {
+    title: 'Opacity & Layering',
+    tabs: {
+      HTML: `<div style="position:relative; width:200px; height:200px;">
+  <!-- Background layer -->
+  <div class="bg-layer"
+    style="width:160px; height:160px;
+      border-radius:50%;
+      background:#ff4d00;
+      position:absolute;">
+  </div>
+  <!-- Foreground layer -->
+  <div class="fg-layer"
+    style="width:120px; height:120px;
+      border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%;
+      background:#1a1a1a;
+      opacity:0.8;
+      position:relative; left:25px; top:10px;">
+  </div>
+</div>
+
+<input type="range" min="0" max="100" value="80" id="op">`,
+      JS: `document.getElementById('op').oninput = function() {
+  document.querySelector('.fg-layer').style.opacity =
+    this.value / 100;
+};`
+    }
+  },
+  draw: {
+    title: 'Freehand Drawing Canvas',
+    tabs: {
+      HTML: `<canvas id="draw-canvas"></canvas>
+
+<!-- Toolbar -->
+<input type="range" id="size" min="1" max="50" value="6">
+<input type="range" id="opacity" min="5" max="100" value="100">
+<input type="color" id="color" value="#1a1a1a">
+<button onclick="undo()">Undo</button>
+<button onclick="clear()">Clear</button>`,
+      JS: `const canvas = document.getElementById('draw-canvas');
+const ctx = canvas.getContext('2d');
+let drawing = false, prev = null, tip = 'round';
+let history = [];
+
+// Tips: round, flat, spray, calligraphy
+function drawStroke(x, y, px, py) {
+  const size = document.getElementById('size').value;
+  const opacity = document.getElementById('opacity').value / 100;
+  const color = document.getElementById('color').value;
+  ctx.globalAlpha = opacity;
+
+  if (tip === 'round') {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = size;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  } else if (tip === 'spray') {
+    for (let i = 0; i < size * 2; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = Math.random() * size;
+      ctx.fillStyle = color;
+      ctx.globalAlpha = opacity * (0.2 + Math.random() * 0.6);
+      ctx.beginPath();
+      ctx.arc(x + Math.cos(a)*r, y + Math.sin(a)*r,
+        0.5 + Math.random()*1.5, 0, Math.PI*2);
+      ctx.fill();
+    }
+  } else if (tip === 'calligraphy') {
+    const dx = x-px, dy = y-py;
+    const angle = Math.atan2(dy, dx);
+    const w = size * (0.15 + Math.abs(Math.sin(angle-Math.PI/4))*0.85);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(1, w);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+
+canvas.onmousedown = e => {
+  drawing = true;
+  const r = canvas.getBoundingClientRect();
+  prev = { x: e.clientX-r.left, y: e.clientY-r.top };
+};
+canvas.onmousemove = e => {
+  if (!drawing) return;
+  const r = canvas.getBoundingClientRect();
+  const x = e.clientX-r.left, y = e.clientY-r.top;
+  drawStroke(x, y, prev.x, prev.y);
+  prev = { x, y };
+};
+canvas.onmouseup = () => {
+  drawing = false;
+  history.push(ctx.getImageData(0,0,canvas.width,canvas.height));
+};
+
+function undo() {
+  if (history.length > 1) {
+    history.pop();
+    ctx.putImageData(history[history.length-1], 0, 0);
+  }
+}`
+    }
+  },
+  lattice: {
+    title: 'Blur, Color & Lattice Grid',
+    tabs: {
+      HTML: `<div class="lattice-grid" id="lattice-grid"></div>
+
+<input type="range" id="blur" min="0" max="20" value="0">
+<input type="color" id="color" value="#ff4d00">
+<input type="range" id="size" min="40" max="100" value="75">
+<input type="range" id="cols" min="3" max="10" value="6">`,
+      CSS: `.lattice-grid {
+  display: grid;
+  gap: 12px;
+  max-width: 800px;
+}
+.lattice-cell {
+  aspect-ratio: 1;
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+}
+.lattice-cell:hover {
+  transform: scale(1.08);
+  z-index: 2;
+}`,
+      JS: `const shapes = {
+  circles: () => '50%',
+  squares: () => '15%',
+  mixed: (i) => ['50%','15%','30% 70% 70% 30%/30% 30% 70% 70%'][i%3],
+  organic: (i) => [
+    '30% 70% 70% 30%/30% 30% 70% 70%',
+    '58% 42% 75% 25%/76% 46% 54% 24%',
+    '50% 50% 33% 67%/55% 27% 73% 45%',
+    '33% 67% 58% 42%/63% 68% 32% 37%'
+  ][i % 4]
+};
+
+let preset = 'circles';
+
+function buildGrid() {
+  const grid = document.getElementById('lattice-grid');
+  const cols = document.getElementById('cols').value;
+  const total = cols * cols;
+  grid.style.gridTemplateColumns = \`repeat(\${cols}, 1fr)\`;
+  grid.innerHTML = '';
+
+  for (let i = 0; i < total; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'lattice-cell';
+    grid.appendChild(cell);
+  }
+  updateGrid();
+}
+
+function updateGrid() {
+  const blur = document.getElementById('blur').value;
+  const color = document.getElementById('color').value;
+  const size = document.getElementById('size').value;
+  const cells = document.querySelectorAll('.lattice-cell');
+
+  cells.forEach((cell, i) => {
+    cell.style.borderRadius = shapes[preset](i);
+    cell.style.background = color;
+    cell.style.filter = \`blur(\${blur}px)\`;
+    cell.style.transform = \`scale(\${size/100})\`;
+    // Vary opacity per cell
+    cell.style.opacity = 0.4 + (i % 4) * 0.2;
+  });
+}
+
+buildGrid();`
+    }
+  },
+  liquify: {
+    title: 'SVG Liquify Effect',
+    tabs: {
+      HTML: `<div class="liquify-wrap" onmousemove="handleLiquify(event)" onmouseleave="resetLiquify()">
+  <svg style="position:absolute;width:0;height:0;">
+    <defs>
+      <filter id="liquify-filter">
+        <feTurbulence id="liquify-turb" type="turbulence"
+          baseFrequency="0.01 0.01" numOctaves="3" seed="2"
+          result="turbulence"/>
+        <feDisplacementMap id="liquify-disp"
+          in="SourceGraphic" in2="turbulence"
+          scale="0" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+  </svg>
+  <h1 style="filter: url(#liquify-filter);">Your Text Here</h1>
+</div>`,
+      CSS: `.liquify-wrap {
+  position: relative;
+  cursor: crosshair;
+  overflow: hidden;
+}
+.liquify-wrap h1 {
+  font-size: clamp(4rem, 10vw, 9rem);
+  font-weight: 900;
+  filter: url(#liquify-filter);
+  transition: filter 0.1s;
+  user-select: none;
+}`,
+      JS: `let liquifyAnim = null;
+let liquifyTarget = 0;
+let liquifyCurrent = 0;
+
+function handleLiquify(e) {
+  const wrap = e.currentTarget;
+  const rect = wrap.getBoundingClientRect();
+  const turb = document.getElementById('liquify-turb');
+
+  const dx = (e.clientX - rect.left - rect.width/2) / rect.width;
+  const dy = (e.clientY - rect.top - rect.height/2) / rect.height;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+
+  const freqX = 0.008 + Math.abs(dx) * 0.04;
+  const freqY = 0.008 + Math.abs(dy) * 0.04;
+  turb.setAttribute('baseFrequency',
+    freqX.toFixed(4) + ' ' + freqY.toFixed(4));
+
+  liquifyTarget = 30 + dist * 80;
+  if (!liquifyAnim) liquifyAnim = requestAnimationFrame(animateLiquify);
+}
+
+function animateLiquify() {
+  const disp = document.getElementById('liquify-disp');
+  liquifyCurrent += (liquifyTarget - liquifyCurrent) * 0.12;
+  if (Math.abs(liquifyCurrent - liquifyTarget) < 0.5 && liquifyTarget === 0) {
+    liquifyCurrent = 0;
+    disp.setAttribute('scale', '0');
+    liquifyAnim = null;
+    return;
+  }
+  disp.setAttribute('scale', liquifyCurrent.toFixed(1));
+  liquifyAnim = requestAnimationFrame(animateLiquify);
+}
+
+function resetLiquify() {
+  liquifyTarget = 0;
+  if (!liquifyAnim) liquifyAnim = requestAnimationFrame(animateLiquify);
+}`
+    }
+  },
+  magnet: {
+    title: 'Magnetic Field Distortion',
+    tabs: {
+      HTML: `<div class="magnet-wrap" onmousemove="handleMagnet(event)"
+     onmouseleave="resetMagnet()">
+  <div class="magnet-line" data-text="Your Text"></div>
+  <div class="magnet-line" data-text="Goes Here" data-accent="true"></div>
+</div>`,
+      CSS: `.magnet-wrap {
+  cursor: none;
+  position: relative;
+}
+.magnet-line {
+  display: flex;
+  justify-content: center;
+}
+.magnet-char {
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-weight: 900;
+  display: inline-block;
+  will-change: transform, filter;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  user-select: none;
+}
+.magnet-char.accent {
+  color: #ff4d00;
+  font-style: italic;
+}
+.magnet-char.space { width: 0.3em; }`,
+      JS: `const MAGNET_RADIUS = 120;
+const MAGNET_STRENGTH = 22;
+const MAGNET_BLUR_MAX = 3.5;
+
+// Init: split text into individual characters
+document.querySelectorAll('.magnet-line').forEach(line => {
+  const text = line.getAttribute('data-text');
+  const isAccent = line.hasAttribute('data-accent');
+  line.innerHTML = '';
+  for (const ch of text) {
+    const span = document.createElement('span');
+    span.className = 'magnet-char' + (isAccent ? ' accent' : '');
+    if (ch === ' ') {
+      span.className += ' space';
+      span.innerHTML = '&nbsp;';
+    } else {
+      span.textContent = ch;
+    }
+    line.appendChild(span);
+  }
+});
+
+const chars = document.querySelectorAll('.magnet-char');
+let magnetMouse = { x: -9999, y: -9999 };
+
+function handleMagnet(e) {
+  magnetMouse = { x: e.clientX, y: e.clientY };
+  chars.forEach(ch => {
+    const rect = ch.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = cx - magnetMouse.x;
+    const dy = cy - magnetMouse.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+
+    if (dist < MAGNET_RADIUS) {
+      const t = 1 - (dist / MAGNET_RADIUS);
+      const ease = t * t * t;
+      const angle = Math.atan2(dy, dx);
+      const pushX = Math.cos(angle) * MAGNET_STRENGTH * ease;
+      const pushY = Math.sin(angle) * MAGNET_STRENGTH * ease;
+      const blur = MAGNET_BLUR_MAX * ease;
+      const scale = 1 + ease * 0.12;
+      ch.style.transform =
+        \`translate(\${pushX.toFixed(1)}px, \${pushY.toFixed(1)}px) scale(\${scale.toFixed(3)})\`;
+      ch.style.filter = \`blur(\${blur.toFixed(1)}px)\`;
+    } else {
+      ch.style.transform = '';
+      ch.style.filter = '';
+    }
+  });
+}
+
+function resetMagnet() {
+  magnetMouse = { x: -9999, y: -9999 };
+  chars.forEach(ch => {
+    ch.style.transform = '';
+    ch.style.filter = '';
+  });
+}`
+    }
+  },
+  smudge: {
+    title: 'Persistent Smudge (Click & Drag)',
+    tabs: {
+      HTML: `<div class="smudge-wrap">
+  <canvas id="smudge-canvas"></canvas>
+  <button onclick="initCanvas()">Reset</button>
+</div>`,
+      JS: `const canvas = document.getElementById('smudge-canvas');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
+let painting = false, prev = null;
+const RADIUS = 30, STRENGTH = 0.55;
+
+function initCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const w = 900, h = 450;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+
+  // Draw your content here
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(0, 0, w, h);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '900 120px Inter, sans-serif';
+  ctx.fillStyle = '#ff4d00';
+  ctx.fillText('Smudge', w/2, h/2);
+  ctx.setTransform(1,0,0,1,0,0);
+}
+
+function smudge(x, y, px, py) {
+  const dpr = window.devicePixelRatio || 1;
+  const cx=x*dpr, cy=y*dpr, r=RADIUS*dpr;
+  const dx=x-px, dy=y-py;
+  const dist = Math.sqrt(dx*dx+dy*dy);
+  if (dist<1) return;
+  const ndx=(dx/dist)*STRENGTH, ndy=(dy/dist)*STRENGTH;
+
+  const sx=Math.max(0,Math.floor(cx-r));
+  const sy=Math.max(0,Math.floor(cy-r));
+  const sw=Math.min(canvas.width-sx,Math.ceil(r*2));
+  const sh=Math.min(canvas.height-sy,Math.ceil(r*2));
+  if(sw<=0||sh<=0)return;
+
+  const img = ctx.getImageData(sx,sy,sw,sh);
+  const d=img.data, src=new Uint8ClampedArray(d);
+
+  for(let py=0;py<sh;py++){
+    for(let px=0;px<sw;px++){
+      const ax=px+sx-cx, ay=py+sy-cy;
+      const dd=Math.sqrt(ax*ax+ay*ay);
+      if(dd>r)continue;
+      const t=1-(dd/r);
+      const f=t*t*(3-2*t); // smoothstep
+      const sX=Math.round(px-ndx*f*r*0.3);
+      const sY=Math.round(py-ndy*f*r*0.3);
+      if(sX<0||sX>=sw||sY<0||sY>=sh)continue;
+      const di=(py*sw+px)*4, si=(sY*sw+sX)*4;
+      const m=f*STRENGTH;
+      d[di]  +=( src[si]  -d[di]  )*m;
+      d[di+1]+=(src[si+1]-d[di+1])*m;
+      d[di+2]+=(src[si+2]-d[di+2])*m;
+      d[di+3]+=(src[si+3]-d[di+3])*m;
+    }
+  }
+  ctx.putImageData(img,sx,sy);
+}
+
+canvas.addEventListener('mousedown', e => {
+  painting = true;
+  const r = canvas.getBoundingClientRect();
+  prev = { x:e.clientX-r.left, y:e.clientY-r.top };
+});
+canvas.addEventListener('mousemove', e => {
+  if(!painting||!prev) return;
+  const r = canvas.getBoundingClientRect();
+  const x=e.clientX-r.left, y=e.clientY-r.top;
+  smudge(x, y, prev.x, prev.y);
+  prev = { x, y };
+});
+canvas.addEventListener('mouseup', () => { painting=false; prev=null; });
+canvas.addEventListener('mouseleave', () => { painting=false; prev=null; });
+
+initCanvas();`
+    }
+  },
+  hsmudge: {
+    title: 'Hover Smudge with Recovery',
+    tabs: {
+      HTML: `<section class="smudge-recover">
+  <canvas id="smudge-recover-canvas"></canvas>
+  <p>Hover to deform — leave to recover</p>
+</section>`,
+      CSS: `.smudge-recover {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #f0ede8;
+  cursor: none;
+}
+.smudge-recover canvas {
+  display: block;
+  border-radius: 20px;
+}`,
+      JS: `const canvas = document.getElementById('smudge-recover-canvas');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
+let prev = null, originalData = null;
+let recoveryRAF = null, isHovering = false, recoveryFrame = 0;
+
+// === CONFIG ===
+const RADIUS = 55;
+const STRENGTH = 0.6;
+const DISPLACEMENT = 0.5;
+const RECOVER_START = 0.02;  // initial recovery speed
+const RECOVER_END = 0.25;    // max recovery speed
+const RECOVER_RAMP = 80;     // frames to reach max speed
+
+function initCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.min(window.innerWidth - 80, 1000);
+  const h = Math.min(window.innerHeight * 0.55, 500);
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+
+  ctx.fillStyle = '#f0ede8';
+  ctx.fillRect(0, 0, w, h);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  const big = Math.min(w * 0.17, 130);
+  ctx.font = \`900 \${big}px Inter, sans-serif\`;
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillText('Your Text', w/2, h*0.3);
+
+  ctx.font = \`900 italic \${big}px Inter, sans-serif\`;
+  ctx.fillStyle = '#ff4d00';
+  ctx.fillText('Goes Here', w/2, h*0.55);
+
+  ctx.setTransform(1,0,0,1,0,0);
+  originalData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  prev = null;
+}
+
+function smudge(x, y, px, py) {
+  const dpr = window.devicePixelRatio || 1;
+  const cx=x*dpr, cy=y*dpr, r=RADIUS*dpr;
+  const dx=x-px, dy=y-py;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  if(dist<1) return;
+  const ndx=(dx/dist)*STRENGTH, ndy=(dy/dist)*STRENGTH;
+
+  const sx=Math.max(0,Math.floor(cx-r));
+  const sy=Math.max(0,Math.floor(cy-r));
+  const sw=Math.min(canvas.width-sx,Math.ceil(r*2));
+  const sh=Math.min(canvas.height-sy,Math.ceil(r*2));
+  if(sw<=0||sh<=0) return;
+
+  const img=ctx.getImageData(sx,sy,sw,sh);
+  const d=img.data, src=new Uint8ClampedArray(d);
+
+  for(let py=0;py<sh;py++){
+    for(let px=0;px<sw;px++){
+      const ax=px+sx-cx, ay=py+sy-cy;
+      const dd=Math.sqrt(ax*ax+ay*ay);
+      if(dd>r) continue;
+      const t=1-(dd/r), f=t*t*(3-2*t);
+      const sX=Math.round(px-ndx*f*r*DISPLACEMENT);
+      const sY=Math.round(py-ndy*f*r*DISPLACEMENT);
+      if(sX<0||sX>=sw||sY<0||sY>=sh) continue;
+      const di=(py*sw+px)*4, si=(sY*sw+sX)*4;
+      const m=f*STRENGTH;
+      d[di]  +=(src[si]  -d[di]  )*m;
+      d[di+1]+=(src[si+1]-d[di+1])*m;
+      d[di+2]+=(src[si+2]-d[di+2])*m;
+      d[di+3]+=(src[si+3]-d[di+3])*m;
+    }
+  }
+  ctx.putImageData(img, sx, sy);
+}
+
+function recover() {
+  if(isHovering){recoveryRAF=null;return;}
+  if(!originalData){recoveryRAF=null;return;}
+  recoveryFrame++;
+
+  const cur=ctx.getImageData(0,0,canvas.width,canvas.height);
+  const c=cur.data, o=originalData.data;
+  let maxDiff=0;
+
+  // Accelerating blend
+  const t=Math.min(recoveryFrame/RECOVER_RAMP, 1);
+  const speed=RECOVER_START + t*t*(RECOVER_END-RECOVER_START);
+
+  for(let i=0;i<c.length;i++){
+    const diff=o[i]-c[i];
+    c[i]=c[i]+diff*speed;
+    if(Math.abs(diff)>maxDiff) maxDiff=Math.abs(diff);
+  }
+  ctx.putImageData(cur,0,0);
+
+  if(maxDiff>0.8) recoveryRAF=requestAnimationFrame(recover);
+  else { ctx.putImageData(originalData,0,0); recoveryRAF=null; }
+}
+
+canvas.addEventListener('mouseenter', () => {
+  isHovering=true; recoveryFrame=0;
+  if(recoveryRAF){cancelAnimationFrame(recoveryRAF);recoveryRAF=null;}
+});
+canvas.addEventListener('mousemove', e => {
+  const r=canvas.getBoundingClientRect();
+  const x=e.clientX-r.left, y=e.clientY-r.top;
+  if(prev) smudge(x, y, prev.x, prev.y);
+  prev={x,y};
+});
+canvas.addEventListener('mouseleave', () => {
+  isHovering=false; prev=null; recoveryFrame=0;
+  if(!recoveryRAF) recoveryRAF=requestAnimationFrame(recover);
+});
+
+initCanvas();
+window.addEventListener('resize', initCanvas);`
+    }
+  },
+  particles: {
+    title: 'Shape Emitter / Particle Trail',
+    tabs: {
+      HTML: `<canvas id="particle-canvas"></canvas>
+<div class="toolbar">
+  <button onclick="setShape('circle')">Circle</button>
+  <button onclick="setShape('square')">Square</button>
+  <button onclick="setShape('triangle')">Triangle</button>
+  <button onclick="setShape('star')">Star</button>
+  <button onclick="setShape('organic')">Organic</button>
+  <input type="range" id="size" min="5" max="60" value="20">
+  <input type="range" id="rate" min="1" max="10" value="3">
+  <input type="range" id="life" min="20" max="200" value="80">
+  <input type="color" id="color" value="#ff4d00">
+  <label><input type="checkbox" id="multi"> Multi-color</label>
+  <input type="file" accept=".svg" onchange="handleSVGUpload(event)">
+</div>`,
+      JS: `const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let shape = 'circle';
+let svgImg = null;
+
+class Particle {
+  constructor(x, y, shape, color, size, life, svg) {
+    this.x = x; this.y = y;
+    this.shape = shape; this.color = color;
+    this.size = size + Math.random() * size * 0.5;
+    this.maxLife = life; this.life = life;
+    this.vx = (Math.random()-0.5) * 2.5;
+    this.vy = (Math.random()-0.5) * 2.5 - 1;
+    this.rotation = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random()-0.5) * 0.08;
+    this.svg = svg;
+  }
+  update() {
+    this.life--; this.x += this.vx; this.y += this.vy;
+    this.vy += 0.02; this.rotation += this.rotSpeed;
+  }
+  get opacity() { return Math.max(0, this.life/this.maxLife); }
+  draw(ctx) {
+    ctx.save();
+    ctx.globalAlpha = this.opacity;
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    ctx.fillStyle = this.color;
+    const s = this.size;
+    if (this.svg) { ctx.drawImage(this.svg, -s/2, -s/2, s, s); }
+    else if (shape==='circle') {
+      ctx.beginPath(); ctx.arc(0,0,s/2,0,Math.PI*2); ctx.fill();
+    } else if (shape==='square') { ctx.fillRect(-s/2,-s/2,s,s); }
+    // ... triangle, star, organic similar
+    ctx.restore();
+  }
+}
+
+function spawn(x, y) {
+  const size = +document.getElementById('size').value;
+  const rate = +document.getElementById('rate').value;
+  const life = +document.getElementById('life').value;
+  const multi = document.getElementById('multi').checked;
+  const base = document.getElementById('color').value;
+  for (let i=0; i<rate; i++) {
+    const c = multi ? \\\`hsl(\\\${Math.random()*360},75%,55%)\\\` : base;
+    particles.push(new Particle(x,y,shape,c,size,life,svgImg));
+  }
+}
+
+canvas.addEventListener('mousedown', e => {
+  const r = canvas.getBoundingClientRect();
+  spawn(e.clientX-r.left, e.clientY-r.top);
+});
+
+(function loop() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p => { p.update(); p.draw(ctx); });
+  particles = particles.filter(p => p.life > 0);
+  requestAnimationFrame(loop);
+})();`
+    }
+  }
+};
+
+let currentSnippet = null;
+let currentTab = null;
+
+function openCodeModal(key) {
+  const snippet = codeSnippets[key];
+  if (!snippet) return;
+  currentSnippet = snippet;
+
+  document.getElementById('code-modal-title').textContent = snippet.title;
+
+  // Build tabs
+  const tabsEl = document.getElementById('code-modal-tabs');
+  const tabKeys = Object.keys(snippet.tabs);
+  tabsEl.innerHTML = tabKeys.map((t, i) =>
+    '<button class="code-tab' + (i === 0 ? ' active' : '') + '" onclick="switchCodeTab(\'' + t + '\', this)">' + t + '</button>'
+  ).join('');
+
+  // Show first tab
+  currentTab = tabKeys[0];
+  document.getElementById('code-modal-pre').textContent = snippet.tabs[currentTab];
+
+  // Reset copy btn
+  const copyBtn = document.getElementById('modal-copy-btn');
+  copyBtn.textContent = 'Copy';
+  copyBtn.classList.remove('copied');
+
+  document.getElementById('code-modal-overlay').classList.add('active');
+}
+
+function switchCodeTab(tab, btn) {
+  currentTab = tab;
+  document.getElementById('code-modal-pre').textContent = currentSnippet.tabs[tab];
+
+  document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+
+  const copyBtn = document.getElementById('modal-copy-btn');
+  copyBtn.textContent = 'Copy';
+  copyBtn.classList.remove('copied');
+}
+
+function copyCode() {
+  const code = currentSnippet.tabs[currentTab];
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('modal-copy-btn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+function closeCodeModal() {
+  document.getElementById('code-modal-overlay').classList.remove('active');
+}
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeCodeModal();
+});
+
+// Side menu
+function toggleSideMenu() {
+  document.getElementById('side-menu').classList.toggle('open');
+  document.getElementById('side-menu-overlay').classList.toggle('open');
+}
+
+// Nav scroll blur + dark section detection
+const navEl = document.querySelector('nav');
+const darkSections = document.querySelectorAll('.section-wrap.dark, .gallery-section, .lattice-section, .liquify-section, .smudge-section, .particle-section');
+
+function updateNav() {
+  const scrolled = window.scrollY > 20;
+  navEl.classList.toggle('scrolled', scrolled);
+
+  // Check if nav overlaps a dark section
+  const navBottom = navEl.getBoundingClientRect().bottom;
+  let onDark = false;
+  darkSections.forEach(sec => {
+    const rect = sec.getBoundingClientRect();
+    if (rect.top < navBottom && rect.bottom > 0) {
+      onDark = true;
+    }
+  });
+  navEl.classList.toggle('on-dark', onDark && scrolled);
+}
+
+window.addEventListener('scroll', updateNav, { passive: true });
+updateNav();
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// Intersection observer for fade-in
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.prop-section, .gallery-section, .particle-section, .manifesto').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(40px)';
+  el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+  observer.observe(el);
+});
+</script>
+
+</body>
+</html>
