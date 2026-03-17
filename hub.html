@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pato — Recursos de Diseño y IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300;1,9..144,700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f2efe9;
+  --fg: #111110;
+  --muted: #888680;
+  --accent: #ff5c00;
+  --accent2: #1a3aff;
+  --card: #ffffff;
+  --border: rgba(17,17,16,0.1);
+  --border-strong: rgba(17,17,16,0.2);
+  --mono: 'Space Mono', monospace;
+  --serif: 'Fraunces', serif;
+}
+
+body {
+  font-family: var(--mono);
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 2.5rem;
+  border-bottom: 0.5px solid transparent;
+  transition: all 0.3s;
+}
+nav.scrolled {
+  background: rgba(242,239,233,0.88);
+  backdrop-filter: blur(20px);
+  border-bottom-color: var(--border);
+}
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--accent); font-style: italic; }
+.nav-tag {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 2.5rem 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero-line {
+  position: absolute;
+  background: var(--border);
+}
+.hero-line.v { width: 0.5px; top: 0; bottom: 0; }
+.hero-line.h { height: 0.5px; left: 0; right: 0; }
+.hero-line:nth-child(1) { left: 25%; }
+.hero-line:nth-child(2) { left: 50%; }
+.hero-line:nth-child(3) { left: 75%; }
+.hero-line:nth-child(4) { top: 33%; }
+.hero-line:nth-child(5) { top: 66%; }
+
+.hero-counter {
+  position: absolute;
+  top: 8rem;
+  right: 2.5rem;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.hero-orb {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  right: -100px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  border: 0.5px solid var(--border-strong);
+  pointer-events: none;
+  animation: spin 40s linear infinite;
+}
+.hero-orb::before {
+  content: '';
+  position: absolute;
+  inset: 40px;
+  border-radius: 50%;
+  border: 0.5px solid var(--border);
+  animation: spin 20s linear infinite reverse;
+}
+.hero-orb::after {
+  content: '';
+  position: absolute;
+  inset: 120px;
+  border-radius: 50%;
+  border: 0.5px solid var(--border-strong);
+}
+.hero-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  top: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
+.hero-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  max-width: 700px;
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero-desc {
+  font-size: 0.8rem;
+  color: var(--muted);
+  max-width: 380px;
+  line-height: 1.7;
+  position: relative;
+  margin-bottom: 2.5rem;
+}
+
+.hero-scroll {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  position: relative;
+}
+.hero-scroll-line {
+  width: 40px;
+  height: 0.5px;
+  background: var(--muted);
+  animation: scrollline 2s ease-in-out infinite;
+}
+@keyframes scrollline {
+  0%, 100% { width: 40px; opacity: 1; }
+  50% { width: 20px; opacity: 0.4; }
+}
+
+/* GALLERY SECTION */
+.gallery {
+  padding: 6rem 2.5rem;
+}
+
+.gallery-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 0.5px solid var(--border);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.gallery-title {
+  font-family: var(--serif);
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+}
+.gallery-title em { font-style: italic; color: var(--accent); }
+
+.gallery-count {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* FILTER PILLS */
+.filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+.filter-pill {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 5px 14px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: 100px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--muted);
+  transition: all 0.15s;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.filter-pill:hover, .filter-pill.active {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+/* CARDS GRID */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 0.5px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.card {
+  background: var(--card);
+  padding: 2rem;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: background 0.15s;
+  position: relative;
+  min-height: 280px;
+}
+
+.card:hover {
+  background: #f8f6f1;
+}
+
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.card-tag {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-family: var(--mono);
+}
+
+.tag-design { background: #fff0e8; color: #cc3d00; }
+.tag-ia { background: #e8f0ff; color: #0028cc; }
+.tag-figma { background: #e8fff2; color: #006633; }
+
+.card-num {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  border: 0.5px solid var(--border);
+  background: var(--bg);
+}
+
+.card h3 {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  flex: 1;
+}
+
+.card h3 em { font-style: italic; color: var(--accent); }
+
+.card p {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 0.5px solid var(--border);
+}
+
+.card-topics {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.card-topic {
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+
+.card-arrow {
+  width: 32px;
+  height: 32px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.card:hover .card-arrow {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+/* ADD CARD */
+.card-add {
+  background: var(--bg);
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 280px;
+  cursor: default;
+}
+
+.add-circle {
+  width: 48px;
+  height: 48px;
+  border: 0.5px dashed var(--border-strong);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: var(--muted);
+}
+
+.card-add p {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ABOUT STRIP */
+.about-strip {
+  margin: 0 2.5rem;
+  padding: 3rem;
+  background: var(--fg);
+  color: var(--bg);
+  border-radius: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  margin-bottom: 6rem;
+}
+
+.about-strip h2 {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.about-strip h2 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.about-strip p {
+  font-size: 0.75rem;
+  line-height: 1.7;
+  color: rgba(242,239,233,0.6);
+  margin-bottom: 1.5rem;
+}
+
+.about-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.about-link {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--bg);
+  text-decoration: none;
+  border: 0.5px solid rgba(242,239,233,0.25);
+  padding: 6px 16px;
+  border-radius: 100px;
+  transition: all 0.15s;
+}
+.about-link:hover {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* FOOTER */
+footer {
+  padding: 2rem 2.5rem;
+  border-top: 0.5px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+footer p {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+
+/* ANIMATIONS */
+.fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  nav { padding: 1rem 1.5rem; }
+  .hero { padding: 0 1.5rem 3rem; }
+  .hero-orb { display: none; }
+  .gallery { padding: 4rem 1.5rem; }
+  .about-strip { grid-template-columns: 1fr; margin: 0 1.5rem; margin-bottom: 4rem; padding: 2rem; }
+  footer { padding: 1.5rem; }
+  .cards-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a class="nav-logo" href="#"><em>P</em>ato</a>
+  <span class="nav-tag">Diseño · IA · Recursos</span>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-line v"></div>
+    <div class="hero-line v"></div>
+    <div class="hero-line v"></div>
+    <div class="hero-line h"></div>
+    <div class="hero-line h"></div>
+  </div>
+  <div class="hero-orb"><div class="hero-dot"></div></div>
+  <div class="hero-counter">RECURSOS — 2025</div>
+
+  <div class="hero-eyebrow">// Diseñador · Ilustrador · Educador — CDMX</div>
+  <h1>Todo<br>en un <em>solo</em><br>lugar.</h1>
+  <p class="hero-desc">Guías, herramientas y referencias sobre diseño, Figma, sistemas visuales e inteligencia artificial. Para diseñadores que quieren entender cómo funciona todo.</p>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    Explorar recursos
+  </div>
+</section>
+
+<section class="gallery" id="gallery">
+  <div class="gallery-header fade-up">
+    <h2 class="gallery-title">Recursos <em>disponibles</em></h2>
+    <span class="gallery-count" id="count">03 entradas</span>
+  </div>
+
+  <div class="filter-row fade-up">
+    <button class="filter-pill active" onclick="filter('all', this)">Todos</button>
+    <button class="filter-pill" onclick="filter('design', this)">Diseño</button>
+    <button class="filter-pill" onclick="filter('figma', this)">Figma</button>
+    <button class="filter-pill" onclick="filter('ia', this)">IA</button>
+  </div>
+
+  <div class="cards-grid" id="cards">
+
+    <a class="card fade-up" href="index.html" data-cat="design">
+      <div class="card-meta">
+        <span class="card-tag tag-design">Diseño</span>
+        <span class="card-num">01</span>
+      </div>
+      <div class="card-icon">◯</div>
+      <h3>Shape <em>Organic</em> Modules</h3>
+      <p>Domina las propiedades visuales fundamentales. Stroke, fill, radius y opacidad aplicadas a objetos para crear composiciones modulares y vivas.</p>
+      <div class="card-footer">
+        <div class="card-topics">
+          <span class="card-topic">Stroke ·</span>
+          <span class="card-topic">Fill ·</span>
+          <span class="card-topic">Radius ·</span>
+          <span class="card-topic">Opacidad</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <a class="card fade-up" href="figma-design-systems.html" data-cat="figma">
+      <div class="card-meta">
+        <span class="card-tag tag-figma">Figma</span>
+        <span class="card-num">02</span>
+      </div>
+      <div class="card-icon">⬡</div>
+      <h3>Sistemas de <em>Diseño</em> en Figma</h3>
+      <p>Guía de referencia completa sobre design tokens, variables, componentes, slots, auto layout y flujo de trabajo profesional en Figma.</p>
+      <div class="card-footer">
+        <div class="card-topics">
+          <span class="card-topic">Tokens ·</span>
+          <span class="card-topic">Componentes ·</span>
+          <span class="card-topic">Variables</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <a class="card fade-up" href="que-es-la-ia.html" data-cat="ia">
+      <div class="card-meta">
+        <span class="card-tag tag-ia">IA</span>
+        <span class="card-num">03</span>
+      </div>
+      <div class="card-icon">◈</div>
+      <h3>¿Qué es <em>la IA</em>?</h3>
+      <p>Una explicación honesta sobre inteligencia artificial, modelos y agentes. Sin marketing, sin términos vacíos. Para creativos y diseñadores.</p>
+      <div class="card-footer">
+        <div class="card-topics">
+          <span class="card-topic">IA ·</span>
+          <span class="card-topic">Modelo ·</span>
+          <span class="card-topic">Agente ·</span>
+          <span class="card-topic">Historia</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <div class="card card-add">
+      <div class="add-circle">+</div>
+      <p>Próximo<br>recurso</p>
+    </div>
+
+  </div>
+</section>
+
+<div class="about-strip fade-up">
+  <h2>Diseño,<br>código y<br><em>curiosidad</em>.</h2>
+  <div>
+    <p>Ilustrador 2D/3D, diseñador y educador basado en Ciudad de México. Clientes como Apple, Coca-Cola, Microsoft, Volkswagen y Autodesk. Cursos en Domestika con miles de estudiantes.</p>
+    <div class="about-links">
+      <a class="about-link" href="https://instagram.com/aaronmartnz" target="_blank">Instagram</a>
+      <a class="about-link" href="https://www.behance.net" target="_blank">Behance</a>
+      <a class="about-link" href="https://www.domestika.org" target="_blank">Domestika</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>// PATO — CDMX — 2025</p>
+  <p>Diseño · IA · Recursos</p>
+</footer>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+function filter(cat, btn) {
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const cards = document.querySelectorAll('.card[data-cat]');
+  let visible = 0;
+  cards.forEach(card => {
+    const match = cat === 'all' || card.dataset.cat === cat;
+    card.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  document.getElementById('count').textContent = `0${visible} entrada${visible !== 1 ? 's' : ''}`;
+}
+</script>
+</body>
+</html>

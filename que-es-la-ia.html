@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Qué es la IA?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #666;
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f5f4f0;
+  --color-border-tertiary: rgba(0,0,0,0.1);
+  --color-border-secondary: rgba(0,0,0,0.2);
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text-primary: #f0ede8;
+    --color-text-secondary: #999;
+    --color-background-primary: #1a1918;
+    --color-background-secondary: #242220;
+    --color-border-tertiary: rgba(255,255,255,0.08);
+    --color-border-secondary: rgba(255,255,255,0.15);
+  }
+  .tag-orange { background: #4A1B0C !important; color: #F0997B !important; }
+  .tag-blue { background: #042C53 !important; color: #85B7EB !important; }
+  .tag-green { background: #173404 !important; color: #97C459 !important; }
+}
+body { font-family: 'Syne', sans-serif; color: var(--color-text-primary); background: var(--color-background-secondary); }
+.site { max-width: 800px; margin: 0 auto; background: var(--color-background-primary); min-height: 100vh; }
+.hero { min-height: 480px; display: flex; flex-direction: column; justify-content: center; padding: 3rem 2rem 2rem; position: relative; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.hero-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--color-border-tertiary) 1px, transparent 1px), linear-gradient(90deg, var(--color-border-tertiary) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.4; pointer-events: none; }
+.hero-tag { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--color-text-secondary); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1.5rem; }
+.hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; line-height: 1; letter-spacing: -0.03em; max-width: 600px; margin-bottom: 1.5rem; position: relative; }
+.hero h1 span { color: #D85A30; }
+.hero-sub { font-size: 1rem; color: var(--color-text-secondary); max-width: 480px; line-height: 1.6; font-weight: 400; position: relative; }
+.nav-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2rem; position: relative; }
+.pill { font-family: 'Space Mono', monospace; font-size: 11px; padding: 6px 14px; border: 0.5px solid var(--color-border-secondary); border-radius: 100px; cursor: pointer; background: var(--color-background-primary); color: var(--color-text-primary); transition: all 0.15s; letter-spacing: 0.05em; text-decoration: none; display: inline-block; }
+.pill:hover { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+.section { padding: 3rem 2rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.section-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--color-text-secondary); margin-bottom: 2rem; display: flex; align-items: center; gap: 12px; }
+.section-label::after { content: ''; flex: 1; height: 0.5px; background: var(--color-border-tertiary); }
+.def-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: var(--color-border-tertiary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 2rem; }
+.def-card { background: var(--color-background-primary); padding: 1.5rem; cursor: pointer; transition: background 0.15s; }
+.def-card:hover, .def-card.active { background: var(--color-background-secondary); }
+.def-card-num { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--color-text-secondary); margin-bottom: 0.75rem; letter-spacing: 0.1em; }
+.def-card h3 { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+.def-card p { font-size: 0.8rem; color: var(--color-text-secondary); line-height: 1.5; font-weight: 400; }
+.def-card-accent { width: 24px; height: 3px; margin-bottom: 1rem; border-radius: 2px; }
+.accent-ia { background: #D85A30; }
+.accent-modelo { background: #378ADD; }
+.accent-agente { background: #1D9E75; }
+.detail-box { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 1.5rem; min-height: 120px; transition: all 0.2s; }
+.detail-box h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem; }
+.detail-box p { font-size: 0.85rem; color: var(--color-text-secondary); line-height: 1.6; font-weight: 400; }
+.code-block { font-family: 'Space Mono', monospace; font-size: 0.75rem; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem; margin-top: 1rem; line-height: 1.8; color: var(--color-text-secondary); white-space: pre; overflow-x: auto; }
+.code-block .hl { color: #D85A30; }
+.code-block .hl2 { color: #378ADD; }
+.code-block .hl3 { color: #1D9E75; }
+.timeline { position: relative; padding-left: 2rem; }
+.timeline::before { content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 0.5px; background: var(--color-border-secondary); }
+.timeline-item { position: relative; margin-bottom: 2rem; }
+.timeline-item::before { content: ''; position: absolute; left: -2rem; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--color-background-primary); border: 1.5px solid var(--color-border-secondary); transition: all 0.15s; }
+.timeline-item:hover::before { background: #D85A30; border-color: #D85A30; }
+.timeline-year { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--color-text-secondary); letter-spacing: 0.1em; margin-bottom: 0.25rem; }
+.timeline-item h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; }
+.timeline-item p { font-size: 0.8rem; color: var(--color-text-secondary); line-height: 1.5; font-weight: 400; }
+.analogy-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center; margin-bottom: 1.5rem; }
+.analogy-card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; }
+.analogy-card h5 { font-size: 0.7rem; font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 0.15em; color: var(--color-text-secondary); margin-bottom: 0.5rem; }
+.analogy-card p { font-size: 0.85rem; line-height: 1.5; font-weight: 400; }
+.vs-badge { font-family: 'Space Mono', monospace; font-size: 0.7rem; font-weight: 700; color: var(--color-text-secondary); text-align: center; }
+.big-quote { font-size: clamp(1.1rem, 3vw, 1.6rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; border-left: 3px solid #D85A30; padding-left: 1.25rem; margin: 2rem 0; }
+.big-quote span { color: #D85A30; }
+.tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 1rem; }
+.tag { font-family: 'Space Mono', monospace; font-size: 10px; padding: 3px 10px; border-radius: 100px; letter-spacing: 0.05em; }
+.tag-orange { background: #FAECE7; color: #993C1D; }
+.tag-blue { background: #E6F1FB; color: #185FA5; }
+.tag-green { background: #EAF3DE; color: #3B6D11; }
+.footer-bar { padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; border-top: 0.5px solid var(--color-border-tertiary); }
+.footer-bar p { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--color-text-secondary); letter-spacing: 0.1em; }
+</style>
+</head>
+<body>
+<div class="site">
+
+  <div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-tag">// Guía definitiva — 2025</div>
+    <h1>¿Qué es<br>la <span>IA</span>?</h1>
+    <p class="hero-sub">Una explicación honesta, sin marketing, sin términos vacíos. Para diseñadores, creativos, y cualquier persona curiosa.</p>
+    <div class="nav-pills">
+      <a class="pill" href="#definiciones">Definiciones</a>
+      <a class="pill" href="#analogias">Analogías</a>
+      <a class="pill" href="#historia">Historia</a>
+      <a class="pill" href="#switch">El switch</a>
+    </div>
+  </div>
+
+  <div class="section" id="definiciones">
+    <div class="section-label">01 — Definiciones</div>
+    <div class="def-cards">
+      <div class="def-card active" onclick="showDetail('ia')">
+        <div class="def-card-num">01 / 03</div>
+        <div class="def-card-accent accent-ia"></div>
+        <h3>IA</h3>
+        <p>Inteligencia Artificial. El campo completo.</p>
+      </div>
+      <div class="def-card" onclick="showDetail('modelo')">
+        <div class="def-card-num">02 / 03</div>
+        <div class="def-card-accent accent-modelo"></div>
+        <h3>Modelo</h3>
+        <p>El cerebro entrenado. El resultado.</p>
+      </div>
+      <div class="def-card" onclick="showDetail('agente')">
+        <div class="def-card-num">03 / 03</div>
+        <div class="def-card-accent accent-agente"></div>
+        <h3>Agente</h3>
+        <p>El sistema que conecta un modelo con el mundo real para que actúe, no solo responda.</p>
+      </div>
+    </div>
+    <div class="detail-box" id="detail-box">
+      <h4>Inteligencia Artificial (IA)</h4>
+      <p>Cualquier sistema que aprende patrones a partir de datos, en vez de seguir reglas escritas por humanos. No es magia — es matemática que encontró sus propias reglas.</p>
+      <div class="tag-row">
+        <span class="tag tag-orange">aprende</span>
+        <span class="tag tag-orange">patrones</span>
+        <span class="tag tag-orange">datos</span>
+      </div>
+    </div>
+    <div class="code-block" id="code-block"><span class="hl">// Programación normal vs IA</span>
+
+<span class="hl2">Normal:</span>   humano escribe reglas → máquina las sigue
+<span class="hl3">IA:</span>        humano da ejemplos → máquina encuentra las reglas sola
+
+<span class="hl">// La diferencia clave</span>
+¿Quién escribió la lógica?
+→ El humano = NO es IA
+→ La máquina aprendiendo = SÍ es IA</div>
+  </div>
+
+  <div class="section" id="analogias">
+    <div class="section-label">02 — Analogías</div>
+    <div class="big-quote">El modelo es el <span>piano</span>.<br>El agente es el <span>pianista</span> con una partitura y un concierto.</div>
+    <div class="analogy-grid">
+      <div class="analogy-card">
+        <h5>Modelo</h5>
+        <p>Existe. Tiene capacidad. Está listo. Pero no hace nada solo. Es el cerebro después de estudiar — estático hasta que alguien lo usa.</p>
+      </div>
+      <div class="vs-badge">→</div>
+      <div class="analogy-card">
+        <h5>Agente</h5>
+        <p>Toma el modelo y le da un objetivo + herramientas + autonomía. Planea, decide, ejecuta, verifica. No es el modelo — lo dirige.</p>
+      </div>
+    </div>
+    <div class="analogy-grid">
+      <div class="analogy-card">
+        <h5>Illustrator</h5>
+        <p>Instalado en tu Mac. Ocupa espacio en disco. Corre en tu máquina. Sigue tus órdenes exactamente.</p>
+      </div>
+      <div class="vs-badge">vs</div>
+      <div class="analogy-card">
+        <h5>Claude (yo)</h5>
+        <p>Vive en servidores remotos. Accesible por app, web, o terminal. Cada conversación es una instancia temporal. No ejecuta gráficos — procesa lenguaje.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="historia">
+    <div class="section-label">03 — Historia sin marketing</div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-year">1950</div>
+        <h4>La pregunta original</h4>
+        <p>Alan Turing pregunta: "¿Puede una máquina pensar?" Sin internet, sin datos masivos. Solo la pregunta.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">1956</div>
+        <h4>Nace el nombre</h4>
+        <p>John McCarthy acuña el término "Inteligencia Artificial" en Dartmouth. Optimismo enorme. Resultados pobres.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">1980s–90s</div>
+        <h4>El fracaso de las reglas</h4>
+        <p>Se intenta programar inteligencia manualmente. Fracasa. La vida real es demasiado compleja para reglas escritas a mano.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2000s</div>
+        <h4>Internet cambia todo</h4>
+        <p>De repente hay datos masivos. Texto, imágenes, comportamiento humano. El combustible estaba listo. Solo faltaba el motor.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2012</div>
+        <h4>El chip de videojuegos</h4>
+        <p>Las GPUs — diseñadas para renderizar juegos — resultan perfectas para entrenar redes neuronales. Accidente brillante.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2017</div>
+        <h4>Transformers</h4>
+        <p>Google publica "Attention is All You Need". La arquitectura que hace posible a Claude, GPT, y todo lo que vino después.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2022–hoy</div>
+        <h4>El momento actual</h4>
+        <p>Los modelos de lenguaje llegan al público. La conversación sobre qué son, cómo funcionan, y qué pueden hacer — apenas empieza.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="switch">
+    <div class="section-label">04 — El switch</div>
+    <div class="big-quote">¿Desde cuándo algo <span>es</span> IA?</div>
+    <div class="detail-box">
+      <h4>El momento exacto</h4>
+      <p>El switch no es tecnológico. Es filosófico. Ocurre cuando alguien decide dejar de querer controlar cada regla y confía en que el sistema aprenda solo.</p>
+    </div>
+    <div class="code-block"><span class="hl">// Sin IA</span>
+humano encuentra el patrón → máquina lo ejecuta
+
+<span class="hl3">// Con IA</span>
+máquina encuentra el patrón → máquina lo ejecuta
+
+<span class="hl2">// La diferencia</span>
+¿Quién encontró el patrón?
+→ Si fue el humano = programación
+→ Si fue la máquina aprendiendo = IA</div>
+    <div class="big-quote" style="margin-top: 2rem; font-size: 1rem;">"Si un sistema tiene efecto real en el mundo,<br>no puede ser <span>nada</span>."</div>
+    <p style="font-size: 0.8rem; color: var(--color-text-secondary); font-weight: 400; margin-top: 0.5rem;">— Pregunta de Pato, CDMX, 2025</p>
+  </div>
+
+  <div class="footer-bar">
+    <p>// GUÍA SOBRE IA — BASADA EN CONVERSACIÓN REAL</p>
+    <p>HECHO CON CLAUDE — ANTHROPIC — 2025</p>
+  </div>
+
+</div>
+
+<script>
+const details = {
+  ia: {
+    title: 'Inteligencia Artificial (IA)',
+    body: 'Cualquier sistema que aprende patrones a partir de datos, en vez de seguir reglas escritas por humanos. No es magia — es matemática que encontró sus propias reglas.',
+    tags: ['<span class="tag tag-orange">aprende</span>', '<span class="tag tag-orange">patrones</span>', '<span class="tag tag-orange">datos</span>'],
+    code: '<span class="hl">// Programación normal vs IA</span>\n\n<span class="hl2">Normal:</span>   humano escribe reglas → máquina las sigue\n<span class="hl3">IA:</span>        humano da ejemplos → máquina encuentra las reglas sola\n\n<span class="hl">// La diferencia clave</span>\n¿Quién escribió la lógica?\n→ El humano = NO es IA\n→ La máquina aprendiendo = SÍ es IA'
+  },
+  modelo: {
+    title: 'Modelo',
+    body: 'El resultado del aprendizaje. Es el archivo matemático ya entrenado — como el cerebro después de estudiar. Existe, tiene capacidad, pero es estático. No hace nada solo.',
+    tags: ['<span class="tag tag-blue">estático</span>', '<span class="tag tag-blue">entrenado</span>', '<span class="tag tag-blue">cerebro</span>'],
+    code: '<span class="hl2">// El modelo es como...</span>\n\nEl piano           → existe, tiene capacidad, está listo\nEl motor de un coche → no se mueve solo\nEl cerebro dormido  → sabe cosas pero no actúa\n\n<span class="hl2">// Ejemplos reales</span>\nclaude-sonnet-4  → modelo de Anthropic\ngpt-4o           → modelo de OpenAI\nllama-3          → modelo de Meta (open source)'
+  },
+  agente: {
+    title: 'Agente',
+    body: 'Un sistema que conecta un modelo con el mundo real. Le da objetivo, herramientas y autonomía para actuar. No es el modelo — es el contexto donde el modelo opera. El pianista no es el piano.',
+    tags: ['<span class="tag tag-green">autonomía</span>', '<span class="tag tag-green">herramientas</span>', '<span class="tag tag-green">objetivo</span>'],
+    code: '<span class="hl3">// Agente = modelo + autonomía + herramientas</span>\n\nModelo solo:\n  tú preguntas → responde → fin\n\nAgente:\n  tú das objetivo →\n  planea → busca → ejecuta código →\n  verifica → corrige → entrega resultado\n\n<span class="hl3">// El agente no es el modelo</span>\nEs el pianista. El modelo es el piano.'
+  }
+};
+
+function showDetail(key) {
+  const d = details[key];
+  document.getElementById('detail-box').innerHTML = '<h4>' + d.title + '</h4><p>' + d.body + '</p><div class="tag-row">' + d.tags.join('') + '</div>';
+  document.getElementById('code-block').innerHTML = d.code;
+  document.querySelectorAll('.def-card').forEach((c, i) => {
+    c.classList.toggle('active', ['ia','modelo','agente'][i] === key);
+  });
+}
+</script>
+</body>
+</html>
