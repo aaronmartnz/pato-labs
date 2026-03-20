@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Card Builder — Pato Labs</title>
+<meta name="description" content="Design data cards with custom shapes, badges, and icons. Export to Chart Studio.">
+<meta property="og:title" content="Card Builder — Pato Labs">
+<meta property="og:description" content="Design data cards with custom shapes, badges, and icons.">
+<meta property="og:image" content="https://aaronmartnz.github.io/pato-labs/card-builder-og.png">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,900;1,900&family=Barlow:wght@400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#FF5C00;
+  --dark:#0d0d0d;
+  --panel:#141414;
+  --border:#1e1e1e;
+  --text:#e8e8e8;
+  --text2:#666;
+  --teal:#A0C9CB;
+}
+body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:52px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(13,13,13,.9);backdrop-filter:blur(12px);z-index:10}
+.logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;font-size:17px;letter-spacing:.06em;color:var(--orange);text-transform:uppercase;text-decoration:none}
+.logo span{color:var(--text)}
+.back{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text2);text-decoration:none;transition:color .2s}
+.back:hover{color:var(--text)}
+.back::before{content:'← '}
+
+/* HERO */
+.hero{padding:80px 32px 64px;max-width:720px;margin:0 auto;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);border:1px solid rgba(160,201,203,.25);border-radius:20px;padding:4px 12px;margin-bottom:28px}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+h1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;font-size:clamp(56px,10vw,96px);line-height:.9;letter-spacing:-.01em;text-transform:uppercase;margin-bottom:20px}
+h1 span{color:var(--teal)}
+.sub{font-size:15px;color:var(--text2);line-height:1.6;max-width:480px;margin:0 auto 40px}
+.cta{display:inline-flex;align-items:center;gap:10px;background:var(--teal);color:#0d2526;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:12px 28px;border-radius:8px;text-decoration:none;transition:background .2s}
+.cta:hover{background:#b8dfe1}
+.cta-arrow{font-size:14px}
+
+/* PREVIEW */
+.preview{padding:0 32px 80px;max-width:900px;margin:0 auto}
+.preview-wrap{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--panel);position:relative}
+.preview-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+.preview-img{width:100%;display:block;aspect-ratio:16/9;background:linear-gradient(135deg,#1a1a1a 0%,#111 100%);display:flex;align-items:center;justify-content:center}
+.preview-placeholder{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text2)}
+
+/* FEATURES */
+.features{padding:0 32px 80px;max-width:720px;margin:0 auto}
+.features-title{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--text2);margin-bottom:24px;text-align:center}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.feat{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+.feat-icon{font-size:20px;margin-bottom:10px}
+.feat-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--text);margin-bottom:5px}
+.feat-desc{font-size:11px;color:var(--text2);line-height:1.5}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:24px 32px;display:flex;align-items:center;justify-content:space-between}
+.foot-left{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2)}
+.foot-right a{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text2);text-decoration:none;transition:color .2s}
+.foot-right a:hover{color:var(--teal)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://aaronmartnz.github.io/pato-labs/" style="display:flex;align-items:center;text-decoration:none"><svg id="PATOlabs-nav" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2320.14 606.61" style="height:26px;width:auto;display:block">
+  <!-- Generator: Adobe Illustrator 30.0.0, SVG Export Plug-In . SVG Version: 2.1.1 Build 123)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #ff6038;
+      }
+
+      .st1 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <g>
+    <path class="st0" d="M979.33,115.91c0-2.66-2.15-4.81-4.81-4.81h-83.6v-.43h-151.47v.43h-83.6c-2.66,0-4.81,2.15-4.81,4.81v141.85c0,2.66,2.15,4.81,4.81,4.81h78.79c2.66,0,4.81,2.15,4.81,4.81v221.71c0,2.66,2.15,4.81,4.81,4.81h141.85c2.66,0,4.81-2.15,4.81-4.81v-221.71c0-2.66,2.15-4.81,4.81-4.81h78.79c2.66,0,4.81-2.15,4.81-4.81V115.91Z"/>
+    <path class="st0" d="M219.97,110.68H79.1c-4.61,0-8.35,3.74-8.35,8.35v366.53c0,4.61,3.74,8.35,8.35,8.35h134.77c4.61,0,8.35-3.74,8.35-8.35v-63.84c0-4.45,3.5-8.09,7.95-8.32,80.62-4.17,144.57-71.37,143.5-153.27-1.08-83.24-70.47-149.45-153.71-149.45Z"/>
+    <path class="st0" d="M1192.65,103.04c-110.61,0-200.27,89.66-200.27,200.27s89.66,200.27,200.27,200.27,200.27-89.66,200.27-200.27-89.66-200.27-200.27-200.27ZM1192.65,356.99c-29.65,0-53.68-24.04-53.68-53.69s24.04-53.69,53.68-53.69,53.68,24.04,53.68,53.69-24.04,53.69-53.68,53.69Z"/>
+    <path class="st0" d="M687.02,493.9h-367.56c-7.64,0-12.55-8.11-9.01-14.88L494.23,127.89c3.8-7.27,14.21-7.27,18.01,0l183.78,351.13c3.54,6.77-1.37,14.88-9.01,14.88Z"/>
+  </g>
+  <g>
+    <polygon class="st1" points="1492.71 227.47 1436.87 227.47 1436.87 476.98 1479.99 476.98 1492.71 476.98 1603.33 476.98 1603.33 428.21 1492.71 428.21 1492.71 227.47"/>
+    <path class="st1" d="M1746.47,319.42c-4.63-4.4-9.98-8.08-16.08-11.02-9.31-4.47-19.73-6.72-31.28-6.72-15.79,0-29.86,3.83-42.23,11.49-12.37,7.66-22.15,18.26-29.33,31.81-7.19,13.55-10.78,28.93-10.78,46.12s3.59,32.46,10.78,45.77c7.18,13.32,17.02,23.92,29.51,31.81,12.49,7.9,26.51,11.84,42.06,11.84,11.78,0,22.32-2.24,31.63-6.72,5.97-2.87,11.21-6.46,15.73-10.74v13.92h53.37v-171.76h-53.37v14.2ZM1710.42,431.39c-7.31,0-13.84-1.71-19.61-5.13-5.78-3.41-10.37-8.18-13.78-14.31-3.42-6.13-5.12-13.08-5.12-20.85s1.7-14.72,5.12-20.85c3.41-6.13,8.01-10.9,13.78-14.31,5.77-3.41,12.31-5.13,19.61-5.13s14.25,1.71,20.15,5.13c5.89,3.42,10.36,8.13,13.43,14.14,3.06,6.01,4.59,12.9,4.59,20.68,0,12.02-3.48,21.8-10.42,29.33-6.95,7.54-16.2,11.31-27.75,11.31Z"/>
+    <path class="st1" d="M1980.24,313.35c-12.61-7.78-26.92-11.66-42.94-11.66-11.55,0-22.15,2.18-31.81,6.54-4.94,2.23-9.41,4.93-13.43,8.08v-95.91h-54.43v256.58h53.72v-12.77c4.09,3.48,8.67,6.51,13.78,9.06,9.66,4.83,20.38,7.25,32.16,7.25,16.02,0,30.39-3.94,43.12-11.84,12.72-7.89,22.67-18.49,29.86-31.81,7.18-13.31,10.78-28.57,10.78-45.77s-3.66-32.52-10.96-45.94c-7.31-13.43-17.26-24.03-29.86-31.81ZM1960.81,411.96c-3.42,6.13-8.01,10.9-13.78,14.31-5.78,3.42-12.32,5.13-19.62,5.13s-14.2-1.65-19.97-4.95c-5.78-3.3-10.31-8.07-13.61-14.31-3.3-6.24-4.95-13.37-4.95-21.38,0-7.54,1.59-14.37,4.77-20.5,3.18-6.13,7.71-10.9,13.61-14.31,5.89-3.41,12.6-5.13,20.15-5.13s13.84,1.71,19.62,5.13c5.77,3.42,10.36,8.19,13.78,14.31,3.41,6.13,5.13,13.08,5.13,20.85s-1.71,14.73-5.13,20.85Z"/>
+    <path class="st1" d="M2159.25,383.86c-6.36-4.12-13.08-7.3-20.15-9.54-7.07-2.24-13.73-4.18-19.97-5.83-6.25-1.64-11.43-3.53-15.55-5.66-4.13-2.12-6.19-4.95-6.19-8.48,0-3.06,1.53-5.53,4.59-7.42,3.06-1.88,7.65-2.83,13.78-2.83s12.9,1.36,19.61,4.06c6.72,2.71,12.78,7.25,18.2,13.61l30.75-31.45c-7.54-9.89-17.55-17.37-30.04-22.44-12.49-5.07-25.92-7.6-40.29-7.6s-26.74,2.36-37.11,7.07c-10.37,4.71-18.38,11.13-24.03,19.26-5.66,8.13-8.48,17.73-8.48,28.8s2,19.21,6.01,25.8c4,6.6,9.19,11.79,15.55,15.55,6.36,3.77,13.08,6.78,20.15,9.01,7.07,2.24,13.84,4.24,20.32,6.01,6.48,1.77,11.72,3.66,15.73,5.66,4,2,6.01,5.13,6.01,9.36,0,3.54-1.71,6.25-5.12,8.13-3.42,1.89-8.07,2.83-13.96,2.83-9.43,0-17.97-1.71-25.62-5.13-7.66-3.41-14.44-8.18-20.32-14.31l-31.1,31.1c6.12,6.36,13.31,11.96,21.56,16.79,8.24,4.83,17.32,8.6,27.22,11.31,9.89,2.71,19.91,4.06,30.04,4.06,21.44,0,38.46-5,51.07-15.02,12.6-10.01,18.91-23.38,18.91-40.11,0-10.84-2-19.62-6.01-26.33-4.01-6.72-9.19-12.13-15.55-16.26Z"/>
+  </g>
+</svg></a>
+  <a class="back" href="https://aaronmartnz.github.io/pato-labs/">Back to hub</a>
+</nav>
+
+<div class="hero">
+  <div class="badge">Free tool · No install · Runs in browser</div>
+  <h1>Card<br><span>Builder</span></h1>
+  <p class="sub">Design data visualization cards with custom shapes, badges, icons and typography. Export directly to Chart Studio.</p>
+  <a class="cta" href="card-builder.html">Open Card Builder <span class="cta-arrow">↗</span></a>
+</div>
+
+<div class="preview">
+  <div class="preview-wrap">
+    <div class="preview-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+    </div>
+    <div class="preview-img">
+      <span class="preview-placeholder">card-builder.html — opens in your browser</span>
+    </div>
+  </div>
+</div>
+
+<div class="features">
+  <div class="features-title">What's inside</div>
+  <div class="feat-grid">
+    <div class="feat">
+      <div class="feat-icon">⬡</div>
+      <div class="feat-name">Custom shapes</div>
+      <div class="feat-desc">Parametric card with notch, interior shape, badge cutout — all adjustable.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">⊞</div>
+      <div class="feat-name">Top-right icons</div>
+      <div class="feat-desc">Up to 6 icons with auto-sizing notch. Upload your own SVG per slot.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">◈</div>
+      <div class="feat-name">Badge system</div>
+      <div class="feat-desc">Logo, title, subtitle — each moveable and toggleable independently.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">→</div>
+      <div class="feat-name">Chart Studio export</div>
+      <div class="feat-desc">One-click JSON export to Chart Studio. Your card becomes the chart frame.</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="foot-left" style="display:flex;align-items:center;gap:12px"><svg id="PATOlabs-footer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2320.14 606.61" style="height:16px;width:auto;display:block;opacity:.45">
+  <!-- Generator: Adobe Illustrator 30.0.0, SVG Export Plug-In . SVG Version: 2.1.1 Build 123)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #ff6038;
+      }
+
+      .st1 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <g>
+    <path class="st0" d="M979.33,115.91c0-2.66-2.15-4.81-4.81-4.81h-83.6v-.43h-151.47v.43h-83.6c-2.66,0-4.81,2.15-4.81,4.81v141.85c0,2.66,2.15,4.81,4.81,4.81h78.79c2.66,0,4.81,2.15,4.81,4.81v221.71c0,2.66,2.15,4.81,4.81,4.81h141.85c2.66,0,4.81-2.15,4.81-4.81v-221.71c0-2.66,2.15-4.81,4.81-4.81h78.79c2.66,0,4.81-2.15,4.81-4.81V115.91Z"/>
+    <path class="st0" d="M219.97,110.68H79.1c-4.61,0-8.35,3.74-8.35,8.35v366.53c0,4.61,3.74,8.35,8.35,8.35h134.77c4.61,0,8.35-3.74,8.35-8.35v-63.84c0-4.45,3.5-8.09,7.95-8.32,80.62-4.17,144.57-71.37,143.5-153.27-1.08-83.24-70.47-149.45-153.71-149.45Z"/>
+    <path class="st0" d="M1192.65,103.04c-110.61,0-200.27,89.66-200.27,200.27s89.66,200.27,200.27,200.27,200.27-89.66,200.27-200.27-89.66-200.27-200.27-200.27ZM1192.65,356.99c-29.65,0-53.68-24.04-53.68-53.69s24.04-53.69,53.68-53.69,53.68,24.04,53.68,53.69-24.04,53.69-53.68,53.69Z"/>
+    <path class="st0" d="M687.02,493.9h-367.56c-7.64,0-12.55-8.11-9.01-14.88L494.23,127.89c3.8-7.27,14.21-7.27,18.01,0l183.78,351.13c3.54,6.77-1.37,14.88-9.01,14.88Z"/>
+  </g>
+  <g>
+    <polygon class="st1" points="1492.71 227.47 1436.87 227.47 1436.87 476.98 1479.99 476.98 1492.71 476.98 1603.33 476.98 1603.33 428.21 1492.71 428.21 1492.71 227.47"/>
+    <path class="st1" d="M1746.47,319.42c-4.63-4.4-9.98-8.08-16.08-11.02-9.31-4.47-19.73-6.72-31.28-6.72-15.79,0-29.86,3.83-42.23,11.49-12.37,7.66-22.15,18.26-29.33,31.81-7.19,13.55-10.78,28.93-10.78,46.12s3.59,32.46,10.78,45.77c7.18,13.32,17.02,23.92,29.51,31.81,12.49,7.9,26.51,11.84,42.06,11.84,11.78,0,22.32-2.24,31.63-6.72,5.97-2.87,11.21-6.46,15.73-10.74v13.92h53.37v-171.76h-53.37v14.2ZM1710.42,431.39c-7.31,0-13.84-1.71-19.61-5.13-5.78-3.41-10.37-8.18-13.78-14.31-3.42-6.13-5.12-13.08-5.12-20.85s1.7-14.72,5.12-20.85c3.41-6.13,8.01-10.9,13.78-14.31,5.77-3.41,12.31-5.13,19.61-5.13s14.25,1.71,20.15,5.13c5.89,3.42,10.36,8.13,13.43,14.14,3.06,6.01,4.59,12.9,4.59,20.68,0,12.02-3.48,21.8-10.42,29.33-6.95,7.54-16.2,11.31-27.75,11.31Z"/>
+    <path class="st1" d="M1980.24,313.35c-12.61-7.78-26.92-11.66-42.94-11.66-11.55,0-22.15,2.18-31.81,6.54-4.94,2.23-9.41,4.93-13.43,8.08v-95.91h-54.43v256.58h53.72v-12.77c4.09,3.48,8.67,6.51,13.78,9.06,9.66,4.83,20.38,7.25,32.16,7.25,16.02,0,30.39-3.94,43.12-11.84,12.72-7.89,22.67-18.49,29.86-31.81,7.18-13.31,10.78-28.57,10.78-45.77s-3.66-32.52-10.96-45.94c-7.31-13.43-17.26-24.03-29.86-31.81ZM1960.81,411.96c-3.42,6.13-8.01,10.9-13.78,14.31-5.78,3.42-12.32,5.13-19.62,5.13s-14.2-1.65-19.97-4.95c-5.78-3.3-10.31-8.07-13.61-14.31-3.3-6.24-4.95-13.37-4.95-21.38,0-7.54,1.59-14.37,4.77-20.5,3.18-6.13,7.71-10.9,13.61-14.31,5.89-3.41,12.6-5.13,20.15-5.13s13.84,1.71,19.62,5.13c5.77,3.42,10.36,8.19,13.78,14.31,3.41,6.13,5.13,13.08,5.13,20.85s-1.71,14.73-5.13,20.85Z"/>
+    <path class="st1" d="M2159.25,383.86c-6.36-4.12-13.08-7.3-20.15-9.54-7.07-2.24-13.73-4.18-19.97-5.83-6.25-1.64-11.43-3.53-15.55-5.66-4.13-2.12-6.19-4.95-6.19-8.48,0-3.06,1.53-5.53,4.59-7.42,3.06-1.88,7.65-2.83,13.78-2.83s12.9,1.36,19.61,4.06c6.72,2.71,12.78,7.25,18.2,13.61l30.75-31.45c-7.54-9.89-17.55-17.37-30.04-22.44-12.49-5.07-25.92-7.6-40.29-7.6s-26.74,2.36-37.11,7.07c-10.37,4.71-18.38,11.13-24.03,19.26-5.66,8.13-8.48,17.73-8.48,28.8s2,19.21,6.01,25.8c4,6.6,9.19,11.79,15.55,15.55,6.36,3.77,13.08,6.78,20.15,9.01,7.07,2.24,13.84,4.24,20.32,6.01,6.48,1.77,11.72,3.66,15.73,5.66,4,2,6.01,5.13,6.01,9.36,0,3.54-1.71,6.25-5.12,8.13-3.42,1.89-8.07,2.83-13.96,2.83-9.43,0-17.97-1.71-25.62-5.13-7.66-3.41-14.44-8.18-20.32-14.31l-31.1,31.1c6.12,6.36,13.31,11.96,21.56,16.79,8.24,4.83,17.32,8.6,27.22,11.31,9.89,2.71,19.91,4.06,30.04,4.06,21.44,0,38.46-5,51.07-15.02,12.6-10.01,18.91-23.38,18.91-40.11,0-10.84-2-19.62-6.01-26.33-4.01-6.72-9.19-12.13-15.55-16.26Z"/>
+  </g>
+</svg><span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2)">Free tools for designers</span></div>
+  <div class="foot-right">
+    <a href="https://instagram.com/aaronmartnz">@aaronmartnz</a>
+  </div>
+</footer>
+
+</body>
+</html>

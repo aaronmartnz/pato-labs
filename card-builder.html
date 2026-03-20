@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Card Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#111;--panel:#181818;--panel2:#1e1e1e;
+  --border:#252525;--border2:#2e2e2e;
+  --accent:#A0C9CB;--accent-h:#b8dfe1;
+  --text:#e0e0e0;--text2:#a0a0a0;--text3:#505050;
+  --input:#1d1d1d;--rr:5px;
+}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;-webkit-font-smoothing:antialiased;font-size:11px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:48px;border-bottom:1px solid var(--border);background:var(--panel);flex-shrink:0}
+.logo{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
+.logo span{color:var(--text)}
+.top-r{display:flex;gap:6px}
+.btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:.08em;text-transform:uppercase;border:none;cursor:pointer;padding:7px 16px;border-radius:8px;transition:all .15s}
+.btn-g{background:var(--panel2);color:var(--text2);border:1px solid var(--border2)}.btn-g:hover{color:var(--text)}
+.btn-blue{background:#1a6aff;color:#fff}.btn-blue:hover{background:#3380ff}
+.main{display:flex;flex:1;overflow:hidden}
+.panel{width:280px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column}
+.panel::-webkit-scrollbar{width:2px}.panel::-webkit-scrollbar-thumb{background:var(--border2)}
+.canvas{flex:1;display:flex;align-items:center;justify-content:center;background:#0a0a0a}
+#card-svg{filter:drop-shadow(0 8px 40px rgba(0,0,0,.7))}
+.sec{padding:10px 12px;border-bottom:1px solid var(--border)}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.stit{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--text3)}
+.tog{font-size:9px;padding:1px 7px;border:1px solid var(--border2);border-radius:4px;background:var(--panel2);color:var(--accent);cursor:pointer;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.05em;transition:all .15s}
+.tog.off{color:var(--text3);border-color:var(--border)}
+.row{display:flex;align-items:center;gap:5px;margin-bottom:4px;min-width:0}
+.row label{color:var(--text2);width:96px;flex-shrink:0;font-size:10px}
+.row input[type=range]{flex:1;min-width:0;height:16px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+.row input[type=range]::-webkit-slider-runnable-track{height:1.5px;background:var(--border2);border-radius:1px}
+.row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);border:none;box-shadow:none;margin-top:-6px}
+.val{font-size:10px;font-family:'DM Mono',monospace;color:var(--text2);min-width:28px;text-align:right}
+.row input[type=color]{width:22px;height:22px;border:1px solid var(--border2);border-radius:3px;cursor:pointer;padding:1px;flex-shrink:0;background:var(--input)}
+.row input[type=text]{flex:1;min-width:0;padding:3px 6px;border:1px solid var(--border2);border-radius:var(--rr);background:var(--input);color:var(--text);font-size:10px}
+.row input[type=number]{width:40px;padding:3px 5px;border:1px solid var(--border2);border-radius:var(--rr);background:var(--input);color:var(--text);font-size:10px;text-align:center}
+.fi{margin-bottom:5px}
+.fi label{display:block;font-size:9px;color:var(--text3);margin-bottom:2px;letter-spacing:.08em;text-transform:uppercase}
+.fi input[type=text]{width:100%;padding:4px 7px;border:1px solid var(--border2);border-radius:var(--rr);background:var(--input);color:var(--text);font-size:11px}
+.fi input[type=text]:focus{border-color:var(--accent);outline:none}
+.islot{display:flex;align-items:center;gap:4px;padding:4px 6px;background:var(--panel2);border:1px solid var(--border);border-radius:5px;margin-bottom:3px;min-width:0}
+.islot .sn{font-size:9px;color:var(--text3);font-family:'DM Mono',monospace;width:14px;flex-shrink:0}
+.islot select{flex:1;min-width:0;font-size:10px;padding:2px 3px;border:1px solid var(--border2);border-radius:3px;background:var(--input);color:var(--text)}
+.svgbtn{font-size:10px;color:var(--accent);border:1.5px solid var(--accent);border-radius:5px;padding:5px 12px;cursor:pointer;position:relative;white-space:nowrap;flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.08em;overflow:hidden;display:inline-block;transition:background .15s}.svgbtn:hover{background:rgba(160,201,203,.1)}
+.svgbtn input[type=file]{position:absolute;opacity:0;top:0;left:0;width:100%;height:100%;cursor:pointer;font-size:0;padding:0;margin:0}
+.svgbtn input[type=file]::-webkit-file-upload-button{display:none;width:0;height:0}
+.svgbtn input[type=file]::file-selector-button{display:none;width:0;height:0}
+.logo-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:6px}
+.logo-opt{border:1.5px solid var(--border2);border-radius:5px;padding:4px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--panel2);transition:border-color .15s}
+.logo-opt:hover{border-color:var(--accent)}.logo-opt.sel{border-color:var(--accent);background:#0d2526}
+.logo-opt span{font-size:8px;color:var(--text3)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">Card<span>Builder</span></div>
+  <div class="top-r">
+    <button class="btn btn-g" onclick="copySVG()">Copy SVG</button>
+    <button class="btn btn-blue" onclick="sendToChartStudio()">⬇ Export to Chart Studio</button>
+  </div>
+</div>
+<div class="main">
+<div class="panel">
+
+  <div class="sec">
+    <div class="sec-hd"><div class="stit">Card</div></div>
+    <div class="row"><label>Width</label><input type="range" id="cw" min="300" max="700" value="561" oninput="sl(this,'cw-v')"><span class="val" id="cw-v">561</span></div>
+    <div class="row"><label>Height</label><input type="range" id="ch" min="200" max="500" value="379" oninput="sl(this,'ch-v')"><span class="val" id="ch-v">379</span></div>
+    <div class="row"><label>Corner radius</label><input type="range" id="cr" min="0" max="60" value="24" oninput="sl(this,'cr-v')"><span class="val" id="cr-v">24</span></div>
+    <div class="row"><label>Fill</label><input type="color" id="c-fill" value="#ffffff" oninput="render()"></div>
+    <div class="row"><label>Stroke color</label><input type="color" id="c-sc" value="#d9d9d9" oninput="render()"></div>
+    <div class="row"><label>Stroke width</label><input type="range" id="c-sw" min="0" max="6" step=".5" value="1" oninput="sl(this,'c-sw-v')"><span class="val" id="c-sw-v">1</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd"><div class="stit">Interior shape</div></div>
+    <div class="row"><label>Fill</label><input type="color" id="s-fill" value="#4CAF50" oninput="render()"></div>
+    <div class="row"><label>Stroke color</label><input type="color" id="s-sc" value="#333333" oninput="render()"></div>
+    <div class="row"><label>Stroke width</label><input type="range" id="s-sw" min="0" max="8" step=".5" value="0" oninput="sl(this,'s-sw-v')"><span class="val" id="s-sw-v">0</span></div>
+    <div class="row"><label>Extra radius</label><input type="range" id="s-r" min="0" max="20" value="4" oninput="sl(this,'s-r-v')"><span class="val" id="s-r-v">4</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd"><div class="stit">Top-right notch &amp; icons</div></div>
+    <div class="row"><label>Icon count</label><input type="number" id="icon-count" value="2" min="0" max="6" oninput="buildSlots();render()"><span style="font-size:9px;color:var(--text3);margin-left:2px">auto notch</span></div>
+    <div class="row"><label>Notch height</label><input type="range" id="nh" min="20" max="130" value="52" oninput="sl(this,'nh-v')"><span class="val" id="nh-v">52</span></div>
+    <div class="row"><label>Notch radius</label><input type="range" id="nr" min="4" max="40" value="18" oninput="sl(this,'nr-v')"><span class="val" id="nr-v">18</span></div>
+    <div class="row"><label>Icon size</label><input type="range" id="i-sz" min="20" max="56" value="32" oninput="sl(this,'i-sz-v');buildSlots();render()"><span class="val" id="i-sz-v">32</span></div>
+    <div class="row"><label>Corner radius</label><input type="range" id="i-r" min="2" max="28" value="8" oninput="sl(this,'i-r-v')"><span class="val" id="i-r-v">8</span></div>
+    <div class="row"><label>Bg opacity</label><input type="range" id="i-bg" min="0" max="40" value="0" oninput="slo(this,'i-bg-v','%')"><span class="val" id="i-bg-v">0%</span></div>
+    <div class="row"><label>Icon color</label><input type="color" id="i-color" value="#424242" oninput="render()"></div>
+    <div id="islots"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd"><div class="stit">Badge container</div></div>
+    <div class="row"><label>Padding H</label><input type="range" id="b-px" min="8" max="40" value="18" oninput="sl(this,'b-px-v')"><span class="val" id="b-px-v">18</span></div>
+    <div class="row"><label>Padding V</label><input type="range" id="b-py" min="6" max="40" value="16" oninput="sl(this,'b-py-v')"><span class="val" id="b-py-v">16</span></div>
+    <div class="row"><label>Notch radius</label><input type="range" id="b-nr" min="2" max="32" value="16" oninput="sl(this,'b-nr-v')"><span class="val" id="b-nr-v">16</span></div>
+    <div class="row"><label>Move H</label><input type="range" id="b-cx" min="-160" max="160" value="0" oninput="sl(this,'b-cx-v')"><span class="val" id="b-cx-v">0</span></div>
+    <div class="row"><label>Move V</label><input type="range" id="b-cy" min="-80" max="80" value="0" oninput="sl(this,'b-cy-v')"><span class="val" id="b-cy-v">0</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd">
+      <div class="stit">Badge icon</div>
+      <button id="ico-tog" class="tog" onclick="toggleEl('ico')">ON</button>
+    </div>
+    <div class="logo-grid" id="logo-grid"></div>
+    <div class="row"><label>Custom SVG</label><div class="svgbtn">Upload<input type="file" accept=".svg" onchange="loadCustomLogo(this)"></div></div>
+    <div class="row"><label>Size (0=auto)</label><input type="range" id="ico-sz" min="0" max="60" value="0" oninput="slauto(this,'ico-sz-v')"><span class="val" id="ico-sz-v">auto</span></div>
+    <div class="row"><label>Move H</label><input type="range" id="ico-x" min="-60" max="60" value="0" oninput="sl(this,'ico-x-v')"><span class="val" id="ico-x-v">0</span></div>
+    <div class="row"><label>Move V</label><input type="range" id="ico-y" min="-40" max="40" value="0" oninput="sl(this,'ico-y-v')"><span class="val" id="ico-y-v">0</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd">
+      <div class="stit">Title</div>
+      <button id="ttl-tog" class="tog" onclick="toggleEl('ttl')">ON</button>
+    </div>
+    <div class="fi"><label>Text</label><input type="text" id="b-title" value="Productivity Software" oninput="render()"></div>
+    <div class="row"><label>Size</label><input type="range" id="b-tfs" min="10" max="48" value="20" oninput="sl(this,'b-tfs-v')"><span class="val" id="b-tfs-v">20</span></div>
+    <div class="row"><label>Color</label><input type="color" id="b-tc" value="#1a1a1a" oninput="render()"></div>
+    <div class="row"><label>Move H</label><input type="range" id="ttl-x" min="-80" max="80" value="0" oninput="sl(this,'ttl-x-v')"><span class="val" id="ttl-x-v">0</span></div>
+    <div class="row"><label>Move V</label><input type="range" id="ttl-y" min="-40" max="40" value="0" oninput="sl(this,'ttl-y-v')"><span class="val" id="ttl-y-v">0</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd">
+      <div class="stit">Subtitle</div>
+      <button id="sub-tog" class="tog" onclick="toggleEl('sub')">ON</button>
+    </div>
+    <div class="fi"><label>Text</label><input type="text" id="b-sub" value="Excel" oninput="render()"></div>
+    <div class="row"><label>Size</label><input type="range" id="b-sfs" min="8" max="32" value="14" oninput="sl(this,'b-sfs-v')"><span class="val" id="b-sfs-v">14</span></div>
+    <div class="row"><label>Color</label><input type="color" id="b-sc" value="#888888" oninput="render()"></div>
+    <div class="row"><label>Move H</label><input type="range" id="sub-x" min="-80" max="80" value="0" oninput="sl(this,'sub-x-v')"><span class="val" id="sub-x-v">0</span></div>
+    <div class="row"><label>Move V</label><input type="range" id="sub-y" min="-40" max="40" value="0" oninput="sl(this,'sub-y-v')"><span class="val" id="sub-y-v">0</span></div>
+  </div>
+
+  <div style="padding:12px;border-top:1px solid var(--border);margin-top:auto">
+    <button class="btn btn-g" style="width:100%;padding:9px" onclick="copyJSON()">⬇ Copy JSON params</button>
+  </div>
+
+</div>
+<div class="canvas">
+  <svg id="card-svg" style="width:500px;height:auto;display:block"></svg>
+</div>
+</div>
+
+<script>
+
+const M = 15.5;
+let selLogo = 'excel';
+let customLogoSVG = null;
+let customIcons = {};
+const svg = document.getElementById('card-svg');
+const BTN_SZ = 32;
+const BTN_R = 8;
+const BTN_PAD = 6;
+window._elVis = {ico:true, ttl:true, sub:true};
+
+// ─── HELPERS ──────────────────────────────────────────────────────────
+function gEl(id){ return document.getElementById(id); }
+function vEl(id){ const el=gEl(id); return el ? +el.value : 0; }
+function sEl(id){ const el=gEl(id); return el ? el.value : ''; }
+
+// Slider oninput helpers (called from HTML)
+function sl(el, vid){ gEl(vid).textContent = el.value; render(); }
+function slo(el, vid, suffix){ gEl(vid).textContent = el.value + (suffix||''); render(); }
+function slauto(el, vid){ gEl(vid).textContent = (+el.value===0)?'auto':el.value; render(); }
+
+// Shorthand used inside render/buildSlots (matches old v/s names)
+function v(id){ return vEl(id); }
+function s(id){ return sEl(id); }
+function g(id){ return gEl(id); }
+
+// ─── VISIBILITY TOGGLES ───────────────────────────────────────────────
+function toggleEl(key){
+  window._elVis[key] = !window._elVis[key];
+  const on = window._elVis[key];
+  const tog = gEl(key+'-tog');
+  if(tog){ tog.textContent=on?'ON':'OFF'; tog.className='tog'+(on?'':' off'); }
+  render();
+}
+
+// ─── AUTO NOTCH WIDTH ─────────────────────────────────────────────────
+function autoNotchW(){
+  const cnt = v('icon-count')||0;
+  if(cnt===0) return 40;
+  const sz = v('i-sz')||32;
+  const gap = Math.round(sz*0.2);
+  return Math.max(44, cnt*sz + (cnt-1)*gap + 28);
+}
+
+function excelFull(x,y,sz){const sc=sz/22;return `<g transform="translate(${x},${y}) scale(${sc})"><rect x="1.33" y="1.33" width="20" height="20" rx="4" fill="white"/><path d="M17.1.94C19.56 1.07 21.52 3.1 21.52 5.6v12l-.01.23c-.12 2.39-2.03 4.3-4.41 4.43l-.24.01H5.1l-.24-.01C2.5 22.14.58 20.23.46 17.83L.45 17.6V5.6C.45 3.1 2.41 1.07 4.87.94L5.1.88H17.1l.24.06ZM5.1 2.27c-1.84 0-3.33 1.49-3.33 3.33v12c0 1.84 1.49 3.33 3.33 3.33H6.43c1.84 0 3.33-1.49 3.33-3.33v-4c0-1.84 1.49-3.33 3.33-3.33H17.1c1.84 0 3.33-1.49 3.33-3.33V5.6c0-1.84-1.49-3.33-3.33-3.33H5.1Z" fill="#00963a"/><path d="M18.9 18.67H17.1l-1.13-2.12-.15-.34h-.02c-.05.11-.1.21-.17.34l-1.17 2.12H12.77l2.04-3.34-1.9-3.33h1.78l1.01 1.9.2.4h.02l.21-.4 1.04-1.9h1.69l-1.93 3.28 1.98 3.39Z" fill="white"/><path d="M8.5 16H5.82c-.73 0-1.32-.6-1.32-1.33s.59-1.33 1.32-1.33H8.5V16Z" fill="#1e6824"/><path d="M9.9 9.83c-.71.7-1.2 1.63-1.35 2.67H5.83c-.73 0-1.32-.59-1.32-1.33s.59-1.33 1.32-1.33H9.9Z" fill="#00963a"/><path d="M11.18 5.86H5.81c-.73 0-1.32.6-1.32 1.33s.59 1.33 1.32 1.33h5.37c.73 0 1.32-.6 1.32-1.33s-.59-1.33-1.32-1.33Z" fill="#72d560"/><path d="M16.47 5.86h-1.41c-.72 0-1.3.6-1.3 1.33s.58 1.33 1.3 1.33h1.41c.72 0 1.3-.6 1.3-1.33s-.58-1.33-1.3-1.33Z" fill="#bdea74"/></g>`;}
+
+const LOGOS = {
+  excel:  { label:'Excel', fn: excelFull,
+    thumb:`<rect x="1" y="1" width="12" height="12" rx="2.5" fill="white"/><path d="M10 0C11.66.08 12.93 1.4 12.93 3v7c-.08 1.6-1.24 2.7-2.83 2.78L10 12.83H3c-1.64-.08-2.78-1.24-2.86-2.83V3C.22 1.4 1.41.09 3.07 0ZM3 1.39c-1.13 0-2.04.91-2.04 2.04v7.3c0 1.13.91 2.04 2.04 2.04h.81c1.13 0 2.04-.91 2.04-2.04V8.29c0-1.13.91-2.04 2.04-2.04H10c1.13 0 2.04-.91 2.04-2.04V3.43c0-1.13-.91-2.04-2.04-2.04H3Z" fill="#00963a"/><path d="M11.57 11.43h-1.1l-.69-1.3c-.04-.07-.07-.13-.1-.18l-.1-.17-.1.17-.1.18-.7 1.3H7.26l1.25-2.04-1.16-2.04h1.09l.62 1.17c.04.07.08.15.13.26.05-.11.09-.19.13-.26l.63-1.17h1.03l-1.18 2 1.21 2.07Z" fill="white"/><path d="M5.2 9.78H3.56c-.45 0-.81-.36-.81-.81s.36-.81.81-.81H5.2v1.62Z" fill="#1e6824"/><path d="M6.05 6.01C5.62 6.44 5.32 7 5.23 7.62H3.57c-.45 0-.81-.36-.81-.81s.36-.81.81-.81H6.05Z" fill="#00963a"/><path d="M6.84 3.58H3.55c-.45 0-.81.36-.81.81s.36.81.81.81H6.84c.45 0 .81-.36.81-.81s-.36-.81-.81-.81Z" fill="#72d560"/><path d="M10.08 3.58H9.22c-.44 0-.79.36-.79.81s.35.81.79.81h.86c.44 0 .79-.36.79-.81s-.35-.81-.79-.81Z" fill="#bdea74"/>` },
+  word:   { label:'Word',
+    fn:(x,y,sz)=>{const sc=sz/22;return `<g transform="translate(${x},${y}) scale(${sc})"><rect x="1.33" y="1.33" width="20" height="20" rx="4" fill="white"/><rect x="1" y="1" width="21" height="21" rx="4.5" fill="#185ABD"/><path d="M5 7h2l2.5 8L12 7h2l-3.5 10h-2L5 7Z" fill="white"/></g>`;},
+    thumb:`<rect x="1" y="1" width="12" height="12" rx="2.5" fill="#185ABD"/><path d="M3 4h1.2l1.5 5L7.5 4h1.2L6.3 11H5L3 4Z" fill="white"/>` },
+  ppt:    { label:'PPT',
+    fn:(x,y,sz)=>{const sc=sz/22;return `<g transform="translate(${x},${y}) scale(${sc})"><rect x="1" y="1" width="21" height="21" rx="4.5" fill="#C43E1C"/><rect x="5" y="7" width="6" height="2" rx="1" fill="white"/><rect x="5" y="11" width="9" height="2" rx="1" fill="white" opacity=".7"/><rect x="5" y="15" width="7" height="2" rx="1" fill="white" opacity=".4"/></g>`;},
+    thumb:`<rect x="1" y="1" width="12" height="12" rx="2.5" fill="#C43E1C"/><rect x="3" y="4" width="3.5" height="1.2" rx=".6" fill="white"/><rect x="3" y="6.5" width="5.5" height="1.2" rx=".6" fill="white" opacity=".7"/><rect x="3" y="9" width="4" height="1.2" rx=".6" fill="white" opacity=".4"/>` },
+  note:   { label:'Note',
+    fn:(x,y,sz)=>{const sc=sz/22;return `<g transform="translate(${x},${y}) scale(${sc})"><rect x="1" y="1" width="21" height="21" rx="4.5" fill="#7719AA"/><path d="M6 7h3l3.5 6V7h2.5v10h-3L8.5 11v6H6V7Z" fill="white"/></g>`;},
+    thumb:`<rect x="1" y="1" width="12" height="12" rx="2.5" fill="#7719AA"/><path d="M3.5 4h1.8l2 3.5V4h1.5v6H7L5 6.5V10H3.5V4Z" fill="white"/>` },
+  gen:    { label:'Custom',
+    fn:(x,y,sz)=>`<g transform="translate(${x},${y})"><rect width="${sz}" height="${sz}" rx="${sz*.2}" fill="#f0f0f0" stroke="#ccc" stroke-width="1"/><rect x="${sz*.2}" y="${sz*.35}" width="${sz*.6}" height="${sz*.08}" rx="${sz*.04}" fill="#bbb"/><rect x="${sz*.2}" y="${sz*.48}" width="${sz*.5}" height="${sz*.08}" rx="${sz*.04}" fill="#ccc"/><rect x="${sz*.2}" y="${sz*.61}" width="${sz*.35}" height="${sz*.08}" rx="${sz*.04}" fill="#ddd"/></g>`,
+    thumb:`<rect x="1" y="1" width="12" height="12" rx="2.5" fill="#f0f0f0" stroke="#ddd" stroke-width=".5"/><rect x="3" y="4" width="6" height="1" rx=".5" fill="#bbb"/><rect x="3" y="6.5" width="5" height="1" rx=".5" fill="#ccc"/><rect x="3" y="9" width="3.5" height="1" rx=".5" fill="#ddd"/>` }
+};
+
+// ─── BUILT-IN ICONS ───────────────────────────────────────────────────
+// Each icon rendered as: rounded-rect container (32×32) + centered icon inside
+// iconBtn(x, y, size, bgColor, bgAlpha, cornerRadius, iconFn, iconColor)
+
+
+function iconBtn(x, y, sz, bg, bgA, r, iconFn, ic){
+  const inner = sz - BTN_PAD*2;
+  const cx = x + sz/2, cy = y + sz/2;
+  const bgRect = bgA > 0
+    ? `<rect x="${x}" y="${y}" width="${sz}" height="${sz}" rx="${r}" fill="${bg}" fill-opacity="${bgA}"/>`
+    : '';
+  return bgRect + iconFn(cx, cy, inner, ic);
+}
+
+// Icon draw functions: (cx, cy, size, color)
+const ICON_FNS = {
+  expand: (cx,cy,sz,c) => {
+    const h=sz/2*.85;
+    return `<g fill="none" stroke="${c}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="${cx-h+4},${cy-h} ${cx+h},${cy-h} ${cx+h},${cy-h+4}"/>
+      <polyline points="${cx+h-4},${cy+h} ${cx-h},${cy+h} ${cx-h},${cy+h-4}"/>
+      <line x1="${cx+h}" y1="${cy-h}" x2="${cx-h+1}" y2="${cy+h-1}"/>
+      <line x1="${cx-h}" y1="${cy+h}" x2="${cx+h-1}" y2="${cy-h+1}"/>
+    </g>`;
+  },
+  dots: (cx,cy,sz,c) => {
+    const r=sz*.12, sp=sz*.32;
+    return `<circle cx="${cx-sp}" cy="${cy}" r="${r}" fill="${c}"/>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="${c}"/>
+      <circle cx="${cx+sp}" cy="${cy}" r="${r}" fill="${c}"/>`;
+  },
+  close: (cx,cy,sz,c) => {
+    const h=sz*.38;
+    return `<path stroke="${c}" stroke-width="1.6" stroke-linecap="round"
+      d="M${cx-h} ${cy-h} L${cx+h} ${cy+h} M${cx+h} ${cy-h} L${cx-h} ${cy+h}"/>`;
+  },
+  share: (cx,cy,sz,c) => {
+    const r=sz*.18, sp=sz*.38;
+    return `<circle cx="${cx}" cy="${cy-sp}" r="${r}" fill="none" stroke="${c}" stroke-width="1.4"/>
+      <circle cx="${cx}" cy="${cy+sp}" r="${r}" fill="none" stroke="${c}" stroke-width="1.4"/>
+      <circle cx="${cx-sp}" cy="${cy}" r="${r}" fill="none" stroke="${c}" stroke-width="1.4"/>
+      <line x1="${cx-sp+r+1}" y1="${cy-1}" x2="${cx-r-1}" y2="${cy-sp+r+1}" stroke="${c}" stroke-width="1.2"/>
+      <line x1="${cx-sp+r+1}" y1="${cy+1}" x2="${cx-r-1}" y2="${cy+sp-r-1}" stroke="${c}" stroke-width="1.2"/>`;
+  },
+  arrow: (cx,cy,sz,c) => {
+    const h=sz*.42;
+    return `<g fill="none" stroke="${c}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="${cx-h+4},${cy-h} ${cx+h},${cy-h} ${cx+h},${cy-h+4}"/>
+      <line x1="${cx+h}" y1="${cy-h}" x2="${cx-h}" y2="${cy+h}"/>
+      <polyline points="${cx-h},${cy+h-4} ${cx-h},${cy+h} ${cx-h+4},${cy+h}"/>
+    </g>`;
+  },
+  custom: (cx,cy,sz,c) => ``
+};
+const ICON_LABELS = {expand:'Expand',dots:'···',close:'Close',share:'Share',arrow:'Arrow',custom:'Custom SVG'};
+
+// ─── BUILD ICON SLOTS ─────────────────────────────────────────────────
+
+
+function buildSlots(){
+  const cnt = v('icon-count');
+  const list = g('islots'); list.innerHTML='';
+  for(let i=0;i<cnt;i++){
+    const div=document.createElement('div'); div.className='islot';
+    const lbl=document.createElement('label'); lbl.textContent=`#${i+1}`; lbl.className='slot-num';
+    const sel=document.createElement('select');
+    Object.entries(ICON_LABELS).forEach(([k,l])=>{
+      const o=document.createElement('option'); o.value=k; o.textContent=l;
+      if((i===0&&k==='expand')||(i===1&&k==='close')) o.selected=true;
+      sel.appendChild(o);
+    });
+    sel.onchange=render;
+    const drop=document.createElement('div'); drop.className='svgbtn';
+    drop.innerHTML=`SVG<input type="file" accept=".svg" style="position:absolute;opacity:0;inset:0;cursor:pointer;width:100%;height:100%;font-size:0" onchange="loadIconSVG(this,${i})">`;
+    div.append(lbl,sel,drop); list.appendChild(div);
+  }
+}
+
+function buildLogoGrid(){
+  const grid=g('logo-grid'); grid.innerHTML='';
+  Object.entries(LOGOS).forEach(([k,logo])=>{
+    const div=document.createElement('div');
+    div.className='logo-opt'+(k===selLogo?' sel':'');
+    div.onclick=()=>{selLogo=k;customLogoSVG=null;buildLogoGrid();render();};
+    const ts=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    ts.setAttribute('viewBox','0 0 14 14'); ts.setAttribute('width','26'); ts.setAttribute('height','26');
+    ts.innerHTML=logo.thumb||''; const sp=document.createElement('span'); sp.textContent=logo.label;
+    div.append(ts,sp); grid.appendChild(div);
+  });
+}
+
+function loadCustomLogo(input){
+  const f=input.files[0]; if(!f)return;
+  const r=new FileReader(); r.onload=e=>{customLogoSVG=e.target.result;selLogo='custom-svg';buildLogoGrid();render();};
+  r.readAsText(f);
+}
+
+function loadIconSVG(input,slot){
+  const f=input.files[0]; if(!f)return;
+  const r=new FileReader(); r.onload=e=>{customIcons[slot]=e.target.result;render();};
+  r.readAsText(f);
+}
+
+function buildPath(W,H,CR,NW,NH,NR,BW,BH,BNR,SR){
+  // shape inset M=15.5, extra rounding SR on shape corners
+  const m=M, r=Math.max(2,(CR-m)*0.6+SR);
+  const x0=m, y0=m, x1=W-m, y1=H-m;
+  const bx=x0+BW, by=y1-BH;
+  const bnr=Math.min(BNR,BH/2,BW/2);
+  const nr=Math.min(NR,NW/2,NH/2);
+  return [
+    `M ${x0+r},${y0}`,
+    `L ${x1-NW-nr},${y0}`,
+    `Q ${x1-NW},${y0} ${x1-NW},${y0+nr}`,
+    `L ${x1-NW},${y0+NH-nr}`,
+    `Q ${x1-NW},${y0+NH} ${x1-NW+nr},${y0+NH}`,
+    `L ${x1-r},${y0+NH}`,
+    `Q ${x1},${y0+NH} ${x1},${y0+NH+r}`,
+    `L ${x1},${y1-r}`,
+    `Q ${x1},${y1} ${x1-r},${y1}`,
+    `L ${bx+bnr},${y1}`,
+    `Q ${bx},${y1} ${bx},${y1-bnr}`,
+    `L ${bx},${by+bnr}`,
+    `Q ${bx},${by} ${bx-bnr},${by}`,
+    `L ${x0+r},${by}`,
+    `Q ${x0},${by} ${x0},${by-r}`,
+    `L ${x0},${y0+r}`,
+    `Q ${x0},${y0} ${x0+r},${y0}`,
+    `Z`
+  ].join(' ');
+}
+
+// ─── MEASURE TEXT ─────────────────────────────────────────────────────
+// Use a hidden SVG text element for accurate measurement
+const _measureSVG = document.createElementNS('http://www.w3.org/2000/svg','svg');
+_measureSVG.style.cssText='position:absolute;visibility:hidden;pointer-events:none;width:0;height:0';
+document.body.appendChild(_measureSVG);
+const _measureText_el = document.createElementNS('http://www.w3.org/2000/svg','text');
+_measureSVG.appendChild(_measureText_el);
+
+function measureText(str, fontSize, weight){
+  _measureText_el.setAttribute('font-size', fontSize);
+  _measureText_el.setAttribute('font-weight', weight||'400');
+  _measureText_el.setAttribute('font-family','system-ui,sans-serif');
+  _measureText_el.textContent = str;
+  return _measureText_el.getComputedTextLength() || str.length*fontSize*0.55;
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────
+
+function render(){
+  const W=v('cw'), H=v('ch'), CR=v('cr');
+  const cFill=s('c-fill'), cSC=s('c-sc'), cSW=v('c-sw');
+  const sFill=s('s-fill'), sSC=s('s-sc'), sSW=v('s-sw'), SR=v('s-r');
+  const NH=v('nh'), NR=v('nr'); let NW=autoNotchW();
+  const iColor=s('i-color'), iCount=v('icon-count');
+  const bTitle=s('b-title'), bSub=s('b-sub');
+  const bTFS=v('b-tfs'), bSFS=v('b-sfs');
+  const bTC=s('b-tc'), bSC=s('b-sc');
+  const bPX=v('b-px'), bPY=v('b-py'), bNR=v('b-nr'), bGap=12;
+
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+
+  // Badge sizing — driven by actual text metrics
+  const titleW = measureText(bTitle, bTFS, '500');
+  const subW   = measureText(bSub,   bSFS, '400');
+  const textW  = Math.max(titleW, subW);
+  const titleH = bTFS * 1.25;   // line-height
+  const subH   = bSub.trim() ? bSFS * 1.25 : 0;
+  const textBlockH = titleH + (bSub.trim() ? 6 + subH : 0); // gap between title and sub
+  const logoSz = textBlockH;    // icon = exact same height as text block
+  const badgeW = bPX + logoSz + bGap + textW + bPX;
+  const badgeH = bPY*2 + textBlockH;
+
+  const path = buildPath(W, H, CR, NW, NH, NR, badgeW, badgeH, bNR, SR);
+
+  // Badge geometry
+  const bx0 = M;
+  const by0 = H - M - badgeH;
+  const logoX = bx0 + bPX;
+  // Center icon and text block together vertically in badge
+  const blockTop = by0 + (badgeH - textBlockH) / 2;
+  const logoY = blockTop;
+  const textX = logoX + logoSz + bGap;
+  const titleBaseline = blockTop + bTFS * 0.82;
+  const subBaseline   = blockTop + titleH + 6 + bSFS * 0.82;
+
+  // Logo HTML
+  let logoHTML = '';
+  if(customLogoSVG){
+    const tmp=document.createElement('div'); tmp.innerHTML=customLogoSVG;
+    const el=tmp.querySelector('svg');
+    if(el){el.setAttribute('x',logoX);el.setAttribute('y',logoY);el.setAttribute('width',logoSz);el.setAttribute('height',logoSz);logoHTML=el.outerHTML;}
+  } else {
+    const lg = LOGOS[selLogo]||LOGOS.excel;
+    logoHTML = lg.fn(logoX, logoY, logoSz);
+  }
+
+  // Icons HTML — each icon is a 32×32 rounded-rect container
+  let iconsHTML = '';
+  const slots = document.querySelectorAll('#islots select');
+  const sz = v('i-sz') || BTN_SZ;
+  const btnR = v('i-r') || BTN_R;
+  const bgAlpha = v('i-bg') / 100;
+  const gap = Math.round(sz * 0.18);
+  const totalW = iCount * sz + Math.max(0, iCount-1) * gap;
+  // Center the icon group in the notch
+  const notchMidX = W - M - NW/2;
+  const notchMidY = M + NH/2;
+  const startX = notchMidX - totalW/2;
+  const startY = notchMidY - sz/2;
+  // bg: slight fill behind each icon
+  const bg = iColor;
+
+  for(let i=0;i<iCount;i++){
+    const ix = startX + i*(sz+gap);
+    const iy = startY;
+    const type = slots[i] ? slots[i].value : 'dots';
+
+    if(type==='custom' && customIcons[i]){
+      // custom SVG: place inside the rounded container
+      iconsHTML += `<rect x="${ix}" y="${iy}" width="${sz}" height="${sz}" rx="${btnR}" fill="${iColor}" fill-opacity="${bgAlpha}"/>`;
+      const tmp=document.createElement('div'); tmp.innerHTML=customIcons[i];
+      const el=tmp.querySelector('svg');
+      if(el){
+        const pad=BTN_PAD;
+        el.setAttribute('x',ix+pad); el.setAttribute('y',iy+pad);
+        el.setAttribute('width',sz-pad*2); el.setAttribute('height',sz-pad*2);
+        iconsHTML+=el.outerHTML;
+      }
+    } else {
+      const fn = ICON_FNS[type] || ICON_FNS.dots;
+      iconsHTML += iconBtn(ix, iy, sz, iColor, bgAlpha, btnR, fn, iColor);
+    }
+  }
+
+  // Badge group + individual offsets
+  // Auto-size notch width from icon count
+  // NW already set above via autoNotchW()
+  const bCX = v('b-cx')||0, bCY = v('b-cy')||0;
+
+  // Independent element visibility & offsets
+  const icoVis  = window._elVis?.ico  !== false;
+  const ttlVis  = window._elVis?.ttl  !== false;
+  const subVis  = window._elVis?.sub  !== false;
+
+  const icoOffX = v('ico-x')||0, icoOffY = v('ico-y')||0;
+  const ttlOffX = v('ttl-x')||0, ttlOffY = v('ttl-y')||0;
+  const subOffX = v('sub-x')||0, subOffY = v('sub-y')||0;
+
+  // Icon size: 0 = auto (tied to text block), otherwise explicit
+  const icoSzRaw = v('ico-sz')||0;
+  const effectiveLogoSz = icoSzRaw > 0 ? icoSzRaw : logoSz;
+
+  const fLogoX  = logoX  + bCX + icoOffX;
+  const fLogoY  = blockTop + bCY + icoOffY;
+  const fTextX  = textX  + bCX + ttlOffX;
+  const fTitleY = titleBaseline + bCY + ttlOffY;
+  const fSubY   = subBaseline   + bCY + subOffY;
+  const fSubX   = fTextX + subOffX - ttlOffX; // sub has its own H offset relative to title
+
+  // Rebuild logoHTML with offset and visibility
+  let logoHTMLf = '';
+  if(icoVis){
+    if(customLogoSVG){
+      const tmp=document.createElement('div'); tmp.innerHTML=customLogoSVG;
+      const el=tmp.querySelector('svg');
+      if(el){el.setAttribute('x',fLogoX);el.setAttribute('y',fLogoY);el.setAttribute('width',effectiveLogoSz);el.setAttribute('height',effectiveLogoSz);logoHTMLf=el.outerHTML;}
+    } else {
+      const lg = LOGOS[selLogo]||LOGOS.excel;
+      logoHTMLf = lg.fn(fLogoX, fLogoY, effectiveLogoSz);
+    }
+  }
+
+  // clipPath for interior shape — chart stays inside
+  const clipId = 'shape-clip';
+
+  svg.innerHTML = `
+    <defs>
+      <clipPath id="${clipId}">
+        <path d="${path}"/>
+      </clipPath>
+    </defs>
+    <rect x="${cSW/2}" y="${cSW/2}" width="${W-cSW}" height="${H-cSW}"
+      rx="${CR}" fill="${cFill}"
+      ${cSW>0?`stroke="${cSC}" stroke-width="${cSW}"`:''}/>
+    <path d="${path}" fill="${sFill}"
+      ${sSW>0?`stroke="${sSC}" stroke-width="${sSW}"`:''}/>
+    <g id="chart-area" clip-path="url(#${clipId})"></g>
+    ${iconsHTML}
+    ${logoHTMLf}
+    ${ttlVis ? `<text x="${fTextX}" y="${fTitleY}"
+      font-family="system-ui,sans-serif" font-size="${bTFS}" font-weight="500"
+      fill="${bTC}">${bTitle}</text>` : ''}
+    ${(subVis && bSub.trim()) ? `<text x="${fSubX}" y="${fSubY}"
+      font-family="system-ui,sans-serif" font-size="${bSFS}"
+      fill="${bSC}">${bSub}</text>` : ''}
+  `;
+
+  // Store current params for Chart Studio export
+  window._cardParams = {
+    W, H, CR, cFill, cSC, cSW,
+    sFill, sSC, sSW, SR,
+    NW, NH, NR,
+    badgeW, badgeH, bNR,
+    path,
+    bTitle, bSub, bTFS, bSFS, bTC, bSC_c: bSC,
+    fLogoX, fLogoY, logoSz, selLogo,
+    fTextX, fTitleY, fSubY,
+    iconsHTML,
+    clipId,
+    // Front shape path + stroke for Chart Studio overlay
+    frontPathD: path,
+    frontViewBox: '0 0 ' + W + ' ' + H,
+    frontStroke: { color: sSC||'none', width: sSW||0 },
+    // chart area bounds (for Chart Studio)
+    chartArea: {
+      x: M, y: M,
+      w: W - M*2,
+      h: H - M - badgeH - M
+    }
+  };
+}
+
+function sendToChartStudio(){
+  if(!window._cardParams){render();}
+  const p = window._cardParams;
+  const cardSVG = document.getElementById('card-svg').outerHTML;
+  const payload = { cardSVG, cardParams: p };
+  const json = JSON.stringify(payload, null, 2);
+  // Download as .json file — works in file:// context
+  const blob = new Blob([json], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'card-builder-export.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function copySVG(){navigator.clipboard.writeText(svg.outerHTML);alert('SVG copiado');}
+
+function copyJSON(){
+  const p={card:{w:v('cw'),h:v('ch'),cr:v('cr'),fill:s('c-fill'),stroke:{color:s('c-sc'),width:v('c-sw')}},
+    shape:{fill:s('s-fill'),stroke:{color:s('s-sc'),width:v('s-sw')},extraRadius:v('s-r'),margin:M},
+    notch:{w:autoNotchW(),h:v('nh'),r:v('nr')},
+    badge:{title:s('b-title'),sub:s('b-sub'),titleSize:v('b-tfs'),subSize:v('b-sfs'),
+      titleColor:s('b-tc'),subColor:s('b-sc'),paddingH:v('b-px'),paddingV:v('b-py'),
+      notchRadius:v('b-nr'),iconGap:12,logo:selLogo},
+    icons:{count:v('icon-count'),color:s('i-color')}};
+  const blob = new Blob([JSON.stringify(p,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='card-params.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────
+window.onerror = function(msg,src,line,col,err){
+  document.body.insertAdjacentHTML('beforeend',
+    '<div style="position:fixed;top:0;left:0;right:0;background:#c00;color:#fff;padding:12px;font:13px monospace;z-index:9999">'+
+    'ERROR: '+msg+' (L'+line+')</div>');
+};
+try {
+  console.log("svg el:", document.getElementById("card-svg"));
+  buildLogoGrid();
+  buildSlots();
+  render();
+  console.log("render done, svg viewBox:", document.getElementById("card-svg").getAttribute("viewBox"));
+} catch(e) {
+  document.body.insertAdjacentHTML('beforeend',
+    '<div style="position:fixed;top:0;left:0;right:0;background:#c00;color:#fff;padding:12px;font:13px monospace;z-index:9999">'+
+    'INIT ERROR: '+e.message+'</div>');
+  console.error(e);
+}
+
+</script>
+</body>
+</html>
