@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PARALLAX · Hero + Shapes</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,900;1,400;1,900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    font-family:'Inter Tight', sans-serif;
+    background:#fff; color:#01017c;
+    overflow-x:hidden;
+  }
+
+  /* === SECTION container === */
+  .section {
+    position:relative;
+    width:100%;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  /* === HERO (section 1) === */
+  .section-1 { background:#fff; color:#01017c; padding:0; }
+  .section-1 canvas.hero-canvas { position:absolute; inset:0; width:100%; height:100%; display:block; cursor:crosshair; }
+  .section-1 .hero-content { position:absolute; left:0; right:0; bottom:88px; top:auto; display:flex; align-items:center; justify-content:center; flex-direction:column; pointer-events:none; z-index:2; }
+  .section-1 .hero-sub { font-family:'Inter Tight',sans-serif; font-weight:400; font-style:italic; font-size:clamp(16px,1.8vw,22px); margin-top:0; max-width:520px; text-align:center; line-height:1.3; pointer-events:auto; color:#01017c; letter-spacing:-0.01em; }
+
+  /* Brand icon — top left, sticky-like position inside hero */
+  .brand-icon { position:absolute; top:24px; left:32px; width:44px; height:44px; z-index:5; display:block; pointer-events:none; }
+  .brand-icon svg { width:100%; height:100%; display:block; }
+
+  .section-topbar { position:absolute; top:0; left:0; right:0; padding:32px 32px 20px 92px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:24px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:#01017c; opacity:0.7; z-index:3; pointer-events:none; }
+  .section-topbar .center { letter-spacing:0.35em; }
+  .section-topbar .right { justify-self:end; }
+  .section-bottom { position:absolute; bottom:24px; left:0; right:0; padding:20px 32px; display:grid; grid-template-columns:1fr auto 1fr; align-items:end; gap:24px; z-index:3; pointer-events:none; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:#01017c; opacity:0.7; }
+  .section-bottom .right { justify-self:end; }
+  .scroll-hint { letter-spacing:0.3em; }
+
+  /* === PIXEL TRANSITION VIDEOS section === */
+  /* Tall section that acts as "scroll pin" — inside is a sticky
+     stage where the actual canvas + videos live, fixed to viewport
+     while the outer scrolls. Scroll progress drives the transition. */
+  .section-pixtrans {
+    position:relative;
+    width:100%;
+    height:300vh;          /* total scroll distance for the transition */
+    background:#01017c;
+    overflow:visible;
+  }
+  .pixtrans-sticky {
+    position:sticky;
+    top:0;
+    width:100%;
+    height:100vh;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#01017c;
+  }
+  .pixtrans-canvas {
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:block;
+    z-index:1;
+  }
+  .pixtrans-label {
+    position:absolute;
+    top:24px;
+    left:32px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+    color:#fff;
+    opacity:0.6;
+    z-index:5;
+    pointer-events:none;
+  }
+  .pixtrans-progress {
+    position:absolute;
+    bottom:24px;
+    left:0; right:0;
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+    color:#fff;
+    opacity:0.55;
+    z-index:5;
+    pointer-events:none;
+  }
+  /* Hidden video elements — only used as drawImage source for canvas */
+  .pixtrans-hidden-videos {
+    position:absolute;
+    width:1px; height:1px;
+    opacity:0;
+    pointer-events:none;
+    overflow:hidden;
+  }
+
+  /* === SHAPES section (from lab 05) === */
+  .section-shapes { background:#fff; color:#000; padding:60px 32px; min-height:100vh; }
+  .shapes-label { position:absolute; top:24px; left:32px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.3em; text-transform:uppercase; opacity:0.5; z-index:5; }
+  .shapes-hint { position:absolute; bottom:24px; left:0; right:0; text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; opacity:0.4; z-index:5; pointer-events:none; }
+  /* Stage is a compact "phase space" — shapes are anchored within it
+     but the filter is applied at the layer level (which has overflow:visible),
+     so shapes can drift outside their nominal box without being clipped. */
+  .shapes-stage { position:relative; width:100%; max-width:1100px; height:560px; }
+  .shapes-meta { position:absolute; inset:0; pointer-events:none; overflow:visible; }
+  .shapes-layer { position:absolute; inset:0; filter:url(#shapes-meta-filter) blur(var(--shapes-blur,3px)); transition:filter 0.3s ease-out; overflow:visible; }
+  .shapes-cyan, .shapes-magenta { mix-blend-mode:multiply; opacity:0.7; }
+  .shapes-cyan .sh { background:#00ffff; }
+  .shapes-magenta .sh { background:#ff00ff; }
+  .shapes-black .sh { background:#01017c; }
+  .sh { position:absolute; will-change:transform,clip-path; transition:clip-path 1.4s cubic-bezier(0.7,0,0.3,1); }
+  .shapes-text-stage { position:absolute; inset:0; z-index:3; display:flex; align-items:center; justify-content:center; pointer-events:none; mix-blend-mode:difference; }
+  .shapes-text-stage .shapes-title { font-family:'Inter Tight',sans-serif; font-weight:900; font-size:clamp(60px,10vw,160px); letter-spacing:-0.05em; text-transform:uppercase; color:#fff; line-height:0.9; text-align:center; }
+
+  /* === SECTION 3 — PROJECTS LIST + FLOATING IMAGES === */
+  .section-projects { background:#fff; color:#01017c; padding:120px 32px; min-height:100vh; align-items:flex-start; justify-content:center; }
+  .projects-inner { position:relative; width:100%; max-width:1100px; margin:0 auto; }
+  .projects-label { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.3em; text-transform:uppercase; opacity:0.5; margin-bottom:48px; }
+  .project-list { list-style:none; padding:0; margin:0; }
+  .project-list li { position:relative; font-family:'Inter Tight',sans-serif; font-weight:900; font-size:clamp(40px,7vw,96px); line-height:1.1; letter-spacing:-0.04em; text-transform:uppercase; color:#01017c; cursor:pointer; padding:12px 0; border-bottom:1px solid rgba(1,1,124,0.15); transition:opacity 0.3s ease, transform 0.3s ease; }
+  .project-list li:first-child { border-top:1px solid rgba(1,1,124,0.15); }
+  .project-list li .row { display:flex; justify-content:space-between; align-items:baseline; gap:24px; }
+  .project-list li .row .year { font-family:'JetBrains Mono',monospace; font-weight:400; font-size:13px; letter-spacing:0.2em; opacity:0.5; align-self:center; }
+  .project-list li em { font-style:italic; font-weight:400; letter-spacing:-0.02em; text-transform:none; }
+  /* Dim non-hovered items when one is hovered for nice focus */
+  .project-list:hover li:not(:hover) { opacity:0.3; }
+
+  .floating-img { position:absolute; width:280px; height:200px; pointer-events:none; transform:translate(-50%,-50%) scale(0); transition:transform 0.5s cubic-bezier(0.23,1,0.32,1), opacity 0.4s ease; opacity:0; z-index:10; overflow:hidden; border-radius:4px; box-shadow:0 24px 60px rgba(1,1,124,0.18); will-change:left,top,transform; }
+  .floating-img.show { transform:translate(-50%,-50%) scale(1); opacity:1; }
+  .floating-img img, .floating-img svg { width:100%; height:100%; object-fit:cover; display:block; }
+
+  @media (max-width:900px) {
+    .section-1 .hero-content { bottom:72px; }
+    .shapes-stage { height:480px; }
+    .floating-img { width:200px; height:140px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 1 — HERO (PARALLAX particles + chromatic)         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section section-1" id="section-1">
+  <div class="brand-icon" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3000 3000">
+      <path fill="#01017c" d="M2477.9,1498c-1.1-317.5-262.3-575.8-582.2-575.8h-217.8v-283.6c0-284.8-231.7-516.4-516.4-516.4h-57.1c-319.9,0-581.1,258.3-582.2,575.8-.5,151.1,56.5,293.4,160.8,402.1-104.3,108.6-161.4,251-160.8,402.1,1.1,317.5,262.3,575.8,582.2,575.8h217.8v283.6c0,284.8,231.7,516.4,516.4,516.4h57.1c319.9,0,581.1-258.3,582.2-575.8.5-151.1-56.5-293.4-160.8-402.1,104.3-108.6,161.4-251,160.8-402.1ZM1104.3,477.8h57.1c88.6,0,160.8,72.1,160.8,160.8v61.4h0v222.2h-222.2c-59.5,0-115.4-23.2-157.4-65.4-42-42.1-65-98.1-64.8-157.6.4-122.1,102-221.4,226.5-221.4ZM1104.3,1722.2c-124.5,0-226.1-99.3-226.5-221.4-.2-59.5,22.8-115.5,64.8-157.6,42-42.1,97.9-65.4,157.4-65.4h222.2v444.4h-217.8ZM1895.7,2522.2h-57.1c-88.6,0-160.8-72.1-160.8-160.8v-61.4h0v-222.2h222.2c59.5,0,115.4,23.2,157.4,65.4,42,42.1,65,98.1,64.8,157.6-.4,122.1-102,221.4-226.5,221.4ZM2057.4,1656.8c-42,42.1-97.9,65.4-157.4,65.4h-222.2v-444.4h217.8c124.5,0,226.1,99.3,226.5,221.4.2,59.5-22.8,115.5-64.8,157.6Z"/>
+    </svg>
+  </div>
+  <header class="section-topbar">
+    <div class="left"></div>
+    <div class="center">— Studio —</div>
+    <div class="right">MX · 2026</div>
+  </header>
+  <canvas class="hero-canvas" id="heroParticles"></canvas>
+  <div class="hero-content">
+    <p class="hero-sub">A film production studio from Mexico City. We make commercials, narratives, and the occasional experiment.</p>
+  </div>
+  <div class="section-bottom">
+    <div class="left">№ 01</div>
+    <div class="center scroll-hint">Scroll ↓</div>
+    <div class="right">Intro</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 2 — PIXEL TRANSITION between two videos          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section-pixtrans" id="section-pixtrans">
+  <div class="pixtrans-sticky">
+    <div class="pixtrans-label">02 — Pixel transition · Scroll to reveal</div>
+    <canvas class="pixtrans-canvas" id="pixtransCanvas"></canvas>
+    <div class="pixtrans-progress" id="pixtransProgress">000 %</div>
+  </div>
+  <!-- Hidden videos read as drawImage source. preload="auto" because
+       we want frames available as soon as the transition starts. -->
+  <div class="pixtrans-hidden-videos">
+    <video id="pixVideoA" src="assets/beach.mp4" muted loop playsinline preload="auto"></video>
+    <video id="pixVideoB" src="assets/peraaaaa.mp4" muted loop playsinline preload="auto"></video>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 3 — SHAPES (Manifesto morphing metaballs)         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section section-shapes" id="section-shapes">
+  <div class="shapes-label">03 — Shape morphing · Circle → Square → Triangle → Hexagon</div>
+
+  <svg style="position:absolute;width:0;height:0;">
+    <defs>
+      <filter id="shapes-meta-filter">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="14"/>
+        <feColorMatrix mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="shapes-stage" id="shapes-stage">
+    <div class="shapes-meta">
+      <div class="shapes-layer shapes-cyan" id="shapes-cyan"></div>
+      <div class="shapes-layer shapes-magenta" id="shapes-magenta"></div>
+      <div class="shapes-layer shapes-black" id="shapes-black"></div>
+    </div>
+    <div class="shapes-text-stage">
+      <h3 class="shapes-title">MANIFESTO</h3>
+    </div>
+  </div>
+
+  <p class="shapes-hint">Shapes change randomly — metaball filter fuses them anyway</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 3 — PROJECTS LIST · floating preview on hover    -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section section-projects" id="section-projects">
+  <div class="projects-inner" id="projects-container">
+    <div class="projects-label">04 — Selected work · Hover to preview</div>
+
+    <ul class="project-list">
+      <li data-img="1">
+        <div class="row"><span>Archidomo <em>— film</em></span><span class="year">2024</span></div>
+      </li>
+      <li data-img="2">
+        <div class="row"><span>Orlinski <em>— commercial</em></span><span class="year">2023</span></div>
+      </li>
+      <li data-img="3">
+        <div class="row"><span>Sea Salt <em>— narrative</em></span><span class="year">2023</span></div>
+      </li>
+      <li data-img="4">
+        <div class="row"><span>North Cape <em>— doc</em></span><span class="year">2022</span></div>
+      </li>
+      <li data-img="5">
+        <div class="row"><span>Volta <em>— music video</em></span><span class="year">2022</span></div>
+      </li>
+      <li data-img="6">
+        <div class="row"><span>Telar <em>— short</em></span><span class="year">2021</span></div>
+      </li>
+    </ul>
+
+    <!-- Floating preview images. Replace <svg> placeholders with <img src="..."> when you have real assets. -->
+    <div class="floating-img" data-i="1">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 200" preserveAspectRatio="xMidYMid slice">
+        <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#01017c"/><stop offset="1" stop-color="#6a6acf"/></linearGradient></defs>
+        <rect width="280" height="200" fill="url(#g1)"/>
+        <g fill="#fff" opacity="0.85" font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="2">
+          <text x="20" y="180">ARCHIDOMO · 01</text>
+        </g>
+        <circle cx="200" cy="80" r="50" fill="#fff" opacity="0.12"/>
+      </svg>
+    </div>
+    <div class="floating-img" data-i="2">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 200" preserveAspectRatio="xMidYMid slice">
+        <rect width="280" height="200" fill="#01017c"/>
+        <rect x="20" y="40" width="160" height="120" fill="#ff00ff" opacity="0.6"/>
+        <rect x="100" y="80" width="160" height="100" fill="#00ffff" opacity="0.5"/>
+        <text x="20" y="180" fill="#fff" font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="2">ORLINSKI · 02</text>
+      </svg>
+    </div>
+    <div class="floating-img" data-i="3">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 200" preserveAspectRatio="xMidYMid slice">
+        <rect width="280" height="200" fill="#0a0a4a"/>
+        <g stroke="#01017c" stroke-width="2" fill="none" opacity="0.9">
+          <path d="M0 120 Q70 60 140 120 T280 120" />
+          <path d="M0 140 Q70 80 140 140 T280 140" />
+          <path d="M0 160 Q70 100 140 160 T280 160" />
+        </g>
+        <text x="20" y="180" fill="#fff" font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="2">SEA SALT · 03</text>
+      </svg>
+    </div>
+    <div class="floating-img" data-i="4">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 200" preserveAspectRatio="xMidYMid slice">
+        <rect width="280" height="200" fill="#01017c"/>
+        <polygon points="0,200 80,80 160,140 220,40 280,120 280,200" fill="#fff" opacity="0.85"/>
+        <text x="20" y="180" fill="#01017c" font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="2">NORTH CAPE · 04</text>
+      </svg>
+    </div>
+    <div class="floating-img" data-i="5">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 200" preserveAspectRatio="xMidYMid slice">
+        <defs><radialGradient id="g5" cx="50%" cy="50%" r="70%"><stop offset="0" stop-color="#ff00ff" stop-opacity="0.7"/><stop offset="1" stop-color="#01017c"/></radialGradient></defs>
+        <rect width="280" height="200" fill="url(#g5)"/>
+        <circle cx="140" cy="100" r="60" fill="none" stroke="#fff" stroke-width="2" opacity="0.6"/>
+        <circle cx="140" cy="100" r="30" fill="#fff" opacity="0.3"/>
+        <text x="20" y="180" fill="#fff" font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="2">VOLTA · 05</text>
+      </svg>
+    </div>
+    <div class="floating-img" data-i="6">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 200" preserveAspectRatio="xMidYMid slice">
+        <rect width="280" height="200" fill="#01017c"/>
+        <g stroke="#00ffff" stroke-width="1" opacity="0.7">
+          <line x1="0" y1="40" x2="280" y2="40"/>
+          <line x1="0" y1="80" x2="280" y2="80"/>
+          <line x1="0" y1="120" x2="280" y2="120"/>
+          <line x1="0" y1="160" x2="280" y2="160"/>
+        </g>
+        <text x="20" y="180" fill="#fff" font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="2">TELAR · 06</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// SECTION VISIBILITY TRACKER
+// Loops in each section check these flags and skip work
+// when their section is offscreen OR tab is inactive.
+// Default: section-1 visible (it's the first thing the user
+// sees), others false until observer confirms.
+// ═══════════════════════════════════════════════════════
+window.__sectionVisible = {
+  'section-1': true,
+  'section-pixtrans': false,
+  'section-shapes': false,
+  'section-projects': false
+};
+window.__tabActive = !document.hidden;
+document.addEventListener('visibilitychange', function() {
+  window.__tabActive = !document.hidden;
+});
+(function() {
+  function attach() {
+    if (!('IntersectionObserver' in window)) {
+      // Fallback: assume all sections visible
+      window.__sectionVisible = {
+        'section-1': true,
+        'section-pixtrans': true,
+        'section-shapes': true,
+        'section-projects': true
+      };
+      return;
+    }
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var id = entry.target.id;
+        if (id) window.__sectionVisible[id] = entry.isIntersecting;
+      });
+    }, { threshold: [0, 0.05, 0.5], rootMargin: '20px' });
+    ['section-1', 'section-pixtrans', 'section-shapes', 'section-projects'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attach);
+  } else {
+    attach();
+  }
+})();
+
+
+// ═══════════════════════════════════════════════════════
+// HERO LOGO GLITCH — 3-tint chromatic split + pixelated bitmap
+// Sin hover: solo el logo azul base. Glitches ambient siguen
+// activos (slices, fragments, blocks) — el ambient da personalidad.
+// Con hover: chroma sube de 0 a 20px → aparecen ghost cyan + azul claro.
+// ═══════════════════════════════════════════════════════
+var LOGO_SVG_RAW = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3000 3000"><g fill="COLOR"><path d="M700.6,1385.2c-51,0-99,19.9-135.1,55.9-36.1,36.1-55.9,84-55.9,135.1s19.9,99,55.9,135.1c36.1,36.1,84,55.9,135.1,55.9s99-19.9,135.1-55.9c36.1-36.1,55.9-84,55.9-135.1s-19.9-99-55.9-135.1c-36.1-36.1-84-55.9-135.1-55.9ZM700.6,1669.5c-51.4,0-93.3-41.9-93.3-93.3s41.9-93.3,93.3-93.3,93.3,41.9,93.3,93.3-41.9,93.3-93.3,93.3Z"/><rect x="935.3" y="1231.6" width="97.7" height="536.9"/><path d="M1355.2,1409.4c-28.2-15.8-60.1-24.2-93.3-24.2-51,0-99,19.9-135.1,56-36.1,36.1-55.9,84.1-55.9,135.1,0,105.3,86.3,190.9,192.4,190.9h45.2c79.7,0,144.5-64.8,144.5-144.5v-391.2h-97.7v177.9ZM1355.2,1622.7c0,25.8-21,46.8-46.8,46.8h-45.2c-52.2,0-94.6-41.8-94.7-93.3,0-24.9,9.7-48.4,27.3-66,17.6-17.6,41.1-27.3,66-27.3,51.4,0,93.3,41.9,93.3,93.3v46.5Z"/><path d="M2388.4,1576.2c0,51.4-41.9,93.3-93.3,93.3s-93.3-41.9-93.3-93.3v-196.9h-97.7v196.9c0,51,19.9,99,55.9,135.1,36.1,36.1,84,55.9,135.1,55.9s99-19.9,135.1-55.9c36.1-36.1,55.9-84,55.9-135.1v-196.9h-97.7v196.9Z"/><rect x="1958.3" y="1231.6" width="97.7" height="536.9"/><path d="M2713.5,1669.3c-21.3,0-40.9-7.2-56.6-19.2-12.2-9.3-22.6-21.1-30.4-34.6h270.5v-48.9c0-51-19.9-99-55.9-135.1-36.1-36.1-84-55.9-135.1-55.9s-99,19.9-135.1,55.9c-36.1,36.1-55.9,84-55.9,135.1,0,10.6.9,21,2.5,31.3.8,5.2,1.9,10.3,3.2,15.4,8.3,33.2,25.4,63.6,50.2,88.4,36.1,36.1,84,55.9,135.1,55.9s99-19.9,135.1-55.9c5.3-5.3,10.2-10.8,14.7-16.5l-93.2-44.4c-15.7,12-35.3,19.2-56.6,19.2ZM2719.2,1482.9c33.5,0,63,17.8,79.5,44.4h-158.9c16.4-26.7,45.9-44.4,79.5-44.4Z"/><path d="M311,1231.4H89.8v411c0,69.6,56.7,126.3,126.3,126.3h95c87.9,0,159.6-71,159.9-158.2.1-41.5-15.5-80.6-44.2-110.4,28.7-29.8,44.3-68.9,44.2-110.4-.3-87.2-72-158.2-159.9-158.2ZM311,1670.9h-95c-15.8,0-28.6-12.8-28.6-28.6v-93.5h124.7c16.3,0,31.7,6.4,43.2,18,11.5,11.6,17.9,27,17.8,43.3-.1,33.5-28,60.8-62.2,60.8ZM355.5,1433.2c-11.5,11.6-26.9,18-43.2,18h-124.7v-122.1h123.6c34.2,0,62.1,27.3,62.2,60.8,0,16.3-6.3,31.7-17.8,43.3Z"/><path d="M1761.9,1231.4h-221.3v411c0,69.6,56.7,126.3,126.3,126.3h95c87.9,0,159.6-71,159.9-158.2.1-41.5-15.5-80.6-44.2-110.4,28.7-29.8,44.3-68.9,44.2-110.4-.3-87.2-72-158.2-159.9-158.2ZM1761.9,1670.9h-95c-15.8,0-28.6-12.8-28.6-28.6v-93.5h124.7c16.3,0,31.7,6.4,43.2,18,11.5,11.6,17.9,27,17.8,43.3-.1,33.5-28,60.8-62.2,60.8ZM1806.3,1433.2c-11.5,11.6-26.9,18-43.2,18h-124.7v-122.1h123.6c34.2,0,62.1,27.3,62.2,60.8,0,16.3-6.3,31.7-17.8,43.3Z"/></g></svg>';
+
+function makeLogo(color) {
+  var img = new Image();
+  img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(LOGO_SVG_RAW.replace('COLOR', color));
+  return img;
+}
+var logoBlue = makeLogo('#01017c');
+var logoCyan = makeLogo('#00d4ff');
+var logoMagenta = makeLogo('#5b7fff');
+
+var heroLoaded = 0, heroReady = false;
+function heroOnLoad() { heroLoaded++; if (heroLoaded >= 3) heroReady = true; }
+logoBlue.onload = heroOnLoad;
+logoCyan.onload = heroOnLoad;
+logoMagenta.onload = heroOnLoad;
+
+(function() {
+  var canvas = document.getElementById('heroParticles');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  // PIXEL_GRID = side length of "pixels" after upscale. Higher = chunkier.
+  var PIXEL_GRID = 5;
+
+  var W, H, dx, dy, dw, dh;
+  // Low-res source: at canvas / PIXEL_GRID. Drawn small then upscaled
+  // with smoothing off → crunchy aliased edges.
+  var src = document.createElement('canvas');
+  var sctx = src.getContext('2d');
+  sctx.imageSmoothingEnabled = false;
+
+  var mouse = { x: -9999, y: -9999, active: false };
+  var slices = [];
+  var fragments = [];
+  var blocks = [];
+
+  function setup() {
+    // Force DPR 1 — chunky pixels, no Retina sharpness blunting the pixelation
+    W = canvas.offsetWidth;
+    H = canvas.offsetHeight;
+    canvas.width = W;
+    canvas.height = H;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+
+    src.width = Math.ceil(W / PIXEL_GRID);
+    src.height = Math.ceil(H / PIXEL_GRID);
+    sctx.imageSmoothingEnabled = false;
+
+    var tw = Math.min(W * 0.78, H * 1.4);
+    dw = tw; dh = tw;
+    dx = (W - dw) / 2;
+    dy = (H - dh) / 2;
+
+    lastChroma = -999;
+    redrawSource(0);
+  }
+
+  // Re-bake source. When chroma < 0.5: solo logo azul base.
+  // Otherwise: 3-tint with offsets.
+  var lastChroma = -999;
+  function redrawSource(chroma) {
+    if (Math.abs(chroma - lastChroma) < 0.5) return;
+    lastChroma = chroma;
+    if (!heroReady) return;
+    sctx.clearRect(0, 0, src.width, src.height);
+    var sdx = dx / PIXEL_GRID;
+    var sdy = dy / PIXEL_GRID;
+    var sdw = dw / PIXEL_GRID;
+    var sdh = dh / PIXEL_GRID;
+
+    if (chroma < 0.5) {
+      sctx.drawImage(logoBlue, sdx, sdy, sdw, sdh);
+    } else {
+      var sChroma = chroma / PIXEL_GRID;
+      sctx.globalCompositeOperation = 'multiply';
+      sctx.drawImage(logoCyan, sdx - sChroma, sdy, sdw, sdh);
+      sctx.drawImage(logoMagenta, sdx + sChroma, sdy, sdw, sdh);
+      sctx.drawImage(logoBlue, sdx, sdy, sdw, sdh);
+      sctx.globalCompositeOperation = 'source-over';
+    }
+  }
+
+  var rt;
+  window.addEventListener('resize', function() {
+    clearTimeout(rt); rt = setTimeout(setup, 150);
+  });
+  canvas.addEventListener('mousemove', function(e) {
+    var r = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - r.left;
+    mouse.y = e.clientY - r.top;
+    mouse.active = true;
+  });
+  canvas.addEventListener('mouseleave', function() {
+    mouse.active = false;
+    mouse.x = -9999; mouse.y = -9999;
+  });
+
+  // Re-bake source once logo loads (covers the case where setup ran
+  // before all 3 SVG images were ready).
+  logoBlue.addEventListener('load', function() { lastChroma = -999; redrawSource(0); });
+  logoCyan.addEventListener('load', function() { lastChroma = -999; redrawSource(0); });
+  logoMagenta.addEventListener('load', function() { lastChroma = -999; redrawSource(0); });
+
+  function spawnSlices() {
+    var rate = mouse.active ? 0.55 : 0.22;
+    if (Math.random() < rate) {
+      var y;
+      if (mouse.active && Math.random() < 0.7) {
+        y = mouse.y + (Math.random() - 0.5) * 240;
+      } else {
+        y = dy + Math.random() * dh;
+      }
+      var h = 3 + Math.random() * 24;
+      var shift = (Math.random() - 0.5) * 60;
+      shift = Math.round(shift / PIXEL_GRID) * PIXEL_GRID;
+      slices.push({ y: y, h: h, shift: shift, life: 0, maxLife: 1 + Math.floor(Math.random() * 3) });
+    }
+    if (slices.length > 40) slices.shift();
+  }
+
+  function spawnFragments() {
+    var n = mouse.active ? 4 : 2;
+    for (var i = 0; i < n; i++) {
+      if (Math.random() > 0.55) continue;
+      var sx, sy;
+      if (mouse.active && Math.random() < 0.6) {
+        sx = mouse.x + (Math.random() - 0.5) * 180;
+        sy = mouse.y + (Math.random() - 0.5) * 140;
+      } else {
+        sx = dx + Math.random() * dw;
+        sy = dy + Math.random() * dh;
+      }
+      var size = 4 + Math.random() * 14;
+      var off = 4 + Math.random() * 24;
+      var ang = Math.random() * Math.PI * 2;
+      var ddx = Math.cos(ang) * off;
+      var ddy = Math.sin(ang) * off;
+      ddx = Math.round(ddx / PIXEL_GRID) * PIXEL_GRID;
+      ddy = Math.round(ddy / PIXEL_GRID) * PIXEL_GRID;
+      fragments.push({ sx: sx, sy: sy, size: size, dx: ddx, dy: ddy, life: 0, maxLife: 1 + Math.floor(Math.random() * 2) });
+    }
+    if (fragments.length > 80) fragments.splice(0, fragments.length - 80);
+  }
+
+  function spawnBlocks() {
+    if (Math.random() < (mouse.active ? 0.4 : 0.15)) {
+      var bx, by;
+      if (mouse.active && Math.random() < 0.65) {
+        bx = mouse.x + (Math.random() - 0.5) * 200;
+        by = mouse.y + (Math.random() - 0.5) * 150;
+      } else {
+        bx = dx + Math.random() * dw;
+        by = dy + Math.random() * dh;
+      }
+      var bs = 12 + Math.random() * 22;
+      var sh = (Math.random() - 0.5) * 50;
+      sh = Math.round(sh / PIXEL_GRID) * PIXEL_GRID;
+      var sv = (Math.random() - 0.5) * 12;
+      sv = Math.round(sv / PIXEL_GRID) * PIXEL_GRID;
+      blocks.push({ x: bx, y: by, size: bs, sx: sh, sy: sv, life: 0, maxLife: 1 + Math.floor(Math.random() * 3) });
+    }
+    if (blocks.length > 25) blocks.shift();
+  }
+
+  function loop() {
+    if (!window.__tabActive || (window.__sectionVisible && window.__sectionVisible['section-1'] === false)) {
+      requestAnimationFrame(loop);
+      return;
+    }
+
+    // Chroma: 0 when no hover, scales up to 20px with cursor proximity
+    var chroma = 0;
+    if (mouse.active) {
+      var d = Math.hypot(mouse.x - (dx + dw / 2), mouse.y - (dy + dh / 2));
+      var prox = 1 - Math.min(1, d / 600);
+      chroma = prox * 20;
+    }
+    if (chroma > 0.5) chroma += (Math.random() - 0.5) * 1.5;
+    redrawSource(chroma);
+
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(src, 0, 0, src.width, src.height, 0, 0, W, H);
+
+    // Slices
+    spawnSlices();
+    var aliveS = [];
+    for (var i = 0; i < slices.length; i++) {
+      var s = slices[i];
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, s.y, W, s.h);
+      var ssy = s.y / PIXEL_GRID;
+      var ssh = s.h / PIXEL_GRID;
+      ctx.drawImage(src, 0, ssy, src.width, ssh, s.shift, s.y, W, s.h);
+      s.life++;
+      if (s.life < s.maxLife) aliveS.push(s);
+    }
+    slices = aliveS;
+
+    // Fragments
+    spawnFragments();
+    var aliveF = [];
+    for (var i = 0; i < fragments.length; i++) {
+      var f = fragments[i];
+      var ssx = f.sx / PIXEL_GRID;
+      var ssy = f.sy / PIXEL_GRID;
+      var ssize = f.size / PIXEL_GRID;
+      try {
+        ctx.drawImage(src, ssx, ssy, ssize, ssize, f.sx + f.dx, f.sy + f.dy, f.size, f.size);
+      } catch (e) {}
+      f.life++;
+      if (f.life < f.maxLife) aliveF.push(f);
+    }
+    fragments = aliveF;
+
+    // Blocks
+    spawnBlocks();
+    var aliveB = [];
+    for (var i = 0; i < blocks.length; i++) {
+      var b = blocks[i];
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(b.x, b.y, b.size, b.size);
+      var bssx = b.x / PIXEL_GRID;
+      var bssy = b.y / PIXEL_GRID;
+      var bsize = b.size / PIXEL_GRID;
+      try {
+        ctx.drawImage(src, bssx, bssy, bsize, bsize, b.x + b.sx, b.y + b.sy, b.size, b.size);
+      } catch (e) {}
+      b.life++;
+      if (b.life < b.maxLife) aliveB.push(b);
+    }
+    blocks = aliveB;
+
+    // Occasional scanline (snapped to pixel rows)
+    if (Math.random() < 0.05) {
+      var sy = Math.floor(Math.random() * (H / PIXEL_GRID)) * PIXEL_GRID;
+      ctx.globalCompositeOperation = 'difference';
+      ctx.fillStyle = 'rgba(1,1,124,0.35)';
+      ctx.fillRect(0, sy, W, PIXEL_GRID);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  function boot() {
+    setup();
+    requestAnimationFrame(loop);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+
+
+// ═══════════════════════════════════════════════════════
+// LAB 05 — SHAPE MORPHING METABALLS
+// Same chromatic-layer structure as the manifesto, but each
+// "ball" is a rectangular element whose clip-path changes
+// periodically between circle, rounded square, triangle,
+// hexagon, pentagon, diamond, octagon. The SVG metaball
+// filter fuses them regardless of shape.
+// ═══════════════════════════════════════════════════════
+(function() {
+  var stage = document.getElementById('shapes-stage');
+  var layerC = document.getElementById('shapes-cyan');
+  var layerM = document.getElementById('shapes-magenta');
+  var layerB = document.getElementById('shapes-black');
+  if (!stage || !layerC || !layerM || !layerB) return;
+
+  // Catalog of clip-paths. All normalized to fill the element.
+  var SHAPES = {
+    circle:   'circle(50% at 50% 50%)',
+    square:   'polygon(10% 0%, 90% 0%, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0% 90%, 0% 10%)', // rounded-ish square via octagon
+    triangle: 'polygon(50% 5%, 95% 95%, 5% 95%)',
+    hexagon:  'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)',
+    pentagon: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)',
+    diamond:  'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+    octagon:  'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)',
+    blob:     'circle(50% at 50% 50%)' // same as circle but labeled separately for variation
+  };
+  var SHAPE_KEYS = Object.keys(SHAPES);
+
+  var balls = [];
+  var time = 0;
+  var W = 0, H = 0;
+
+  function setup() {
+    var rect = stage.getBoundingClientRect();
+    W = rect.width;
+    H = rect.height;
+    layerC.innerHTML = '';
+    layerM.innerHTML = '';
+    layerB.innerHTML = '';
+    balls = [];
+
+    var configs = [
+      { hx: 0.15, hy: 0.30, r: 220, ax: 60, ay: 40, ab: 0.0 },
+      { hx: 0.42, hy: 0.20, r: 260, ax: 50, ay: 50, ab: 0.25 },
+      { hx: 0.75, hy: 0.28, r: 230, ax: 55, ay: 45, ab: 0.5 },
+      { hx: 0.25, hy: 0.72, r: 240, ax: 65, ay: 40, ab: 0.15 },
+      { hx: 0.55, hy: 0.78, r: 230, ax: 55, ay: 55, ab: 0.75 },
+      { hx: 0.82, hy: 0.70, r: 250, ax: 50, ay: 50, ab: 0.4 },
+      { hx: 0.50, hy: 0.50, r: 200, ax: 80, ay: 50, ab: 1.0 }
+    ];
+
+    for (var i = 0; i < configs.length; i++) {
+      var c = configs[i];
+      var hx = c.hx * W;
+      var hy = c.hy * H;
+      // Start each ball with a different shape
+      var startShape = SHAPE_KEYS[i % SHAPE_KEYS.length];
+
+      function makeEl(layer, scale) {
+        scale = scale || 1;
+        var r = c.r * scale;
+        var el = document.createElement('div');
+        el.className = 'sh';
+        el.style.width = r + 'px';
+        el.style.height = r + 'px';
+        el.style.left = (hx - r / 2) + 'px';
+        el.style.top = (hy - r / 2) + 'px';
+        el.style.clipPath = SHAPES[startShape];
+        layer.appendChild(el);
+        return el;
+      }
+
+      balls.push({
+        el_c: makeEl(layerC, 0.68),
+        el_m: makeEl(layerM, 0.68),
+        el_b: makeEl(layerB, 1.0),
+        hx: hx, hy: hy,
+        x: hx, y: hy,
+        ab: c.ab,
+        shape: startShape,
+        nextMorph: time + 1.5 + Math.random() * 2.5,
+        phase: Math.random() * Math.PI * 2,
+        phase2: Math.random() * Math.PI * 2,
+        freq: 0.2 + Math.random() * 0.25,
+        freq2: 0.12 + Math.random() * 0.15,
+        ampX: c.ax, ampY: c.ay,
+        // Each ball rotates slowly too — gives the shapes character
+        rot: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 0.25
+      });
+    }
+  }
+
+  var rt;
+  window.addEventListener('resize', function() {
+    clearTimeout(rt);
+    rt = setTimeout(setup, 200);
+  });
+
+  // Cursor tracking
+  var mouse = { x: -9999, y: -9999, active: false };
+  var hover = 0;
+
+  stage.addEventListener('mousemove', function(e) {
+    var rect = stage.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+    mouse.active = true;
+  });
+  stage.addEventListener('mouseleave', function() {
+    mouse.active = false;
+    mouse.x = -9999; mouse.y = -9999;
+  });
+  stage.addEventListener('touchmove', function(e) {
+    var rect = stage.getBoundingClientRect();
+    mouse.x = e.touches[0].clientX - rect.left;
+    mouse.y = e.touches[0].clientY - rect.top;
+    mouse.active = true;
+  }, { passive: true });
+
+  // Magnetic attraction — all balls follow the cursor
+  var ATTRACT_RADIUS = 1400;
+  var ATTRACT_STRENGTH = 0.7;
+
+  // Velocity state for spring physics
+  function ensureVel(b) { if (b.vx === undefined) { b.vx = 0; b.vy = 0; } }
+
+  function pickNewShape(current) {
+    var next = SHAPE_KEYS[Math.floor(Math.random() * SHAPE_KEYS.length)];
+    if (next === current) next = SHAPE_KEYS[(SHAPE_KEYS.indexOf(current) + 1) % SHAPE_KEYS.length];
+    return next;
+  }
+
+  function loop() {
+    if (!balls.length) { setup(); requestAnimationFrame(loop); return; }
+    time += 0.014;
+
+    // Hover ramp — fast in, slow out
+    var targetHover = mouse.active ? 1 : 0;
+    var lerpRate = mouse.active ? 0.10 : 0.035;
+    hover += (targetHover - hover) * lerpRate;
+
+    var blur = 3 + hover * 4;
+    layerC.style.setProperty('--shapes-blur', blur + 'px');
+    layerM.style.setProperty('--shapes-blur', blur + 'px');
+    layerB.style.setProperty('--shapes-blur', (blur * 0.7) + 'px');
+
+    for (var i = 0; i < balls.length; i++) {
+      var b = balls[i];
+      ensureVel(b);
+
+      // Periodic shape morph
+      if (time >= b.nextMorph) {
+        var newShape = pickNewShape(b.shape);
+        b.shape = newShape;
+        b.el_c.style.clipPath = SHAPES[newShape];
+        b.el_m.style.clipPath = SHAPES[newShape];
+        b.el_b.style.clipPath = SHAPES[newShape];
+        b.nextMorph = time + 1.8 + Math.random() * 3.0;
+      }
+
+      b.rot += b.rotSpeed;
+
+      // Ambient motion
+      var ambX = Math.sin(time * b.freq + b.phase) * b.ampX
+               + Math.sin(time * b.freq2 + b.phase2) * b.ampX * 0.4;
+      var ambY = Math.cos(time * b.freq * 0.85 + b.phase * 1.3) * b.ampY
+               + Math.cos(time * b.freq2 * 1.1 + b.phase2 * 0.7) * b.ampY * 0.4;
+
+      var targetX = b.hx + ambX;
+      var targetY = b.hy + ambY;
+
+      // Cursor attraction (only when hovering)
+      if (hover > 0.01) {
+        var dxC = mouse.x - targetX;
+        var dyC = mouse.y - targetY;
+        var distC = Math.sqrt(dxC * dxC + dyC * dyC);
+        if (distC < ATTRACT_RADIUS) {
+          var pull = 1 - distC / ATTRACT_RADIUS;
+          pull = pull * pull;
+          var force = pull * ATTRACT_STRENGTH * hover;
+          targetX += dxC * force;
+          targetY += dyC * force;
+        }
+      }
+
+      // Spring + damping
+      b.vx += (targetX - b.x) * 0.08;
+      b.vy += (targetY - b.y) * 0.08;
+      b.vx *= 0.86;
+      b.vy *= 0.86;
+      b.x += b.vx;
+      b.y += b.vy;
+
+      var dxv = b.x - b.hx;
+      var dyv = b.y - b.hy;
+
+      // EDGE-ONLY chromatic aberration:
+      // Since cyan/magenta layers are 68% of the black size, shifting
+      // them by ~30% of the radius means they only peek OUT the sides
+      // (left/right) of the larger black mass — never overlap the
+      // black center. This produces clean cyan/magenta halos at the
+      // edges without the muddy red/green tints in the dark interior.
+      // Per-ball ab intensity controls how far each one peeks.
+      // Hover globally amplifies it.
+      var ab = (15 + b.ab * 35) * (0.5 + hover * 0.7);
+
+      b.el_c.style.transform = 'translate(' + (dxv - ab).toFixed(1) + 'px,' + dyv.toFixed(1) + 'px) rotate(' + b.rot.toFixed(1) + 'deg)';
+      b.el_m.style.transform = 'translate(' + (dxv + ab).toFixed(1) + 'px,' + dyv.toFixed(1) + 'px) rotate(' + b.rot.toFixed(1) + 'deg)';
+      b.el_b.style.transform = 'translate(' + dxv.toFixed(1) + 'px,' + dyv.toFixed(1) + 'px) rotate(' + b.rot.toFixed(1) + 'deg)';
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function() { setup(); requestAnimationFrame(loop); });
+  else { setup(); requestAnimationFrame(loop); }
+})();
+
+
+// ═══════════════════════════════════════════════════════
+// SECTION 3 — PROJECTS LIST WITH FLOATING PREVIEW IMAGES
+// On hover over a list item, the matching floating image
+// fades + scales in and follows the cursor with lerp 0.15.
+// Each image has its own position state so they smoothly
+// hand off when you move between items quickly.
+// Images are positioned absolute within the projects-inner
+// container, so coords are computed relative to that.
+// ═══════════════════════════════════════════════════════
+(function() {
+  var container = document.getElementById('projects-container');
+  if (!container) return;
+
+  var imgs = container.querySelectorAll('.floating-img');
+  var items = container.querySelectorAll('[data-img]');
+  if (!imgs.length || !items.length) return;
+
+  var mx = 0, my = 0;
+  var positions = {};
+
+  // Initialize each image at the center of the container so the
+  // first hover doesn't snap from (0,0).
+  function initPositions() {
+    var rect = container.getBoundingClientRect();
+    var cx = rect.width / 2;
+    var cy = rect.height / 2;
+    mx = cx; my = cy;
+    imgs.forEach(function(img) {
+      positions[img.dataset.i] = { x: cx, y: cy };
+      img.style.left = cx + 'px';
+      img.style.top = cy + 'px';
+    });
+  }
+
+  container.addEventListener('mousemove', function(e) {
+    var r = container.getBoundingClientRect();
+    mx = e.clientX - r.left;
+    my = e.clientY - r.top;
+  });
+
+  items.forEach(function(item) {
+    item.addEventListener('mouseenter', function() {
+      var img = container.querySelector('.floating-img[data-i="' + item.dataset.img + '"]');
+      if (img) img.classList.add('show');
+    });
+    item.addEventListener('mouseleave', function() {
+      var img = container.querySelector('.floating-img[data-i="' + item.dataset.img + '"]');
+      if (img) img.classList.remove('show');
+    });
+  });
+
+  // Independent lerp per image so they trail smoothly even when
+  // you whip the cursor across many items rapidly.
+  function animate() {
+    imgs.forEach(function(img) {
+      var p = positions[img.dataset.i];
+      if (!p) return;
+      p.x += (mx - p.x) * 0.15;
+      p.y += (my - p.y) * 0.15;
+      img.style.left = p.x + 'px';
+      img.style.top = p.y + 'px';
+    });
+    requestAnimationFrame(animate);
+  }
+
+  initPositions();
+  animate();
+  window.addEventListener('resize', initPositions);
+})();
+
+
+// ═══════════════════════════════════════════════════════
+// SECTION 2 — PIXEL TRANSITION BETWEEN TWO VIDEOS
+//
+// Scroll-pin section: the outer .section-pixtrans is 300vh tall.
+// Inside, .pixtrans-sticky is 100vh and `position:sticky; top:0`.
+// As the user scrolls through the 300vh, the sticky pane stays
+// fixed to the viewport. We compute scroll progress as:
+//   t = scrollTopWithinSection / (sectionHeight - viewportHeight)
+//   t goes from 0 (entering) to 1 (about to exit)
+//
+// Per-tile reveal formula:
+//   delay = (stable random per tile)  ∈ [0, 1]
+//   localT = (t - delay * 0.5) / 0.5
+//   t < 0.5 → video A disarming:
+//             tile A visible if localT < 0 (not yet its turn to leave)
+//   t > 0.5 → video B arming:
+//             tile B visible if localT > 1 (its turn has come)
+//
+// Grid granularity is interpolated by t:
+//   cols at t=0 → 16, cols at t=1 → 64. Same for rows ratio.
+//
+// We pre-compute a stable shuffled delay map ONCE (using a seeded
+// random keyed by (col,row)) so the same tile order is used every
+// frame regardless of grid size. The map is regenerated only when
+// the grid dimensions change.
+// ═══════════════════════════════════════════════════════
+(function() {
+  var section = document.getElementById('section-pixtrans');
+  var canvas = document.getElementById('pixtransCanvas');
+  var videoA = document.getElementById('pixVideoA');
+  var videoB = document.getElementById('pixVideoB');
+  var progressEl = document.getElementById('pixtransProgress');
+  if (!section || !canvas || !videoA || !videoB) return;
+
+  var ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  var W, H, dpr;
+  var dimsCache = { cols: 0, rows: 0 };
+  // Stable seeded random per tile, indexed by row*MAX_COLS + col.
+  // Since we cap cols/rows at MAX_GRID, we can pre-fill once.
+  var MAX_GRID = 96;
+  var delayMap = new Float32Array(MAX_GRID * MAX_GRID);
+  (function fillDelayMap() {
+    // Mulberry32-ish seeded PRNG so the layout is identical every load.
+    var s = 0x42424242 >>> 0;
+    function rand() {
+      s = (s + 0x6D2B79F5) >>> 0;
+      var t = s;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    }
+    for (var i = 0; i < delayMap.length; i++) {
+      delayMap[i] = rand();
+    }
+  })();
+
+  function setup() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.offsetWidth;
+    H = canvas.offsetHeight;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    ctx.imageSmoothingEnabled = false;
+  }
+  var rt;
+  window.addEventListener('resize', function() {
+    clearTimeout(rt); rt = setTimeout(setup, 150);
+  });
+
+  // === Compute scroll progress within the pinned section ===
+  // 0 when section just enters viewport (top of section hits top of viewport)
+  // 1 when section is about to leave (bottom of pin region reaches viewport)
+  function computeProgress() {
+    var rect = section.getBoundingClientRect();
+    var sectionH = section.offsetHeight;
+    var vh = window.innerHeight;
+    // Pin distance = section height - viewport height (since sticky is 100vh)
+    var pinDist = sectionH - vh;
+    if (pinDist <= 0) return 0;
+    // scrolled = how many px past the top of the section we are
+    var scrolled = -rect.top;
+    var t = scrolled / pinDist;
+    return Math.max(0, Math.min(1, t));
+  }
+
+  // === Cover-fit a video into the canvas (like background-size:cover) ===
+  // Returns the args for drawImage: sx, sy, sW, sH, dx, dy, dw, dh
+  // We use these to draw into individual tiles below.
+  function coverParams(video) {
+    var vw = video.videoWidth || 16;
+    var vh = video.videoHeight || 9;
+    var canvasAspect = W / H;
+    var videoAspect = vw / vh;
+    var sx, sy, sW, sH;
+    if (videoAspect > canvasAspect) {
+      // Video is wider than canvas → crop sides
+      sH = vh;
+      sW = vh * canvasAspect;
+      sx = (vw - sW) / 2;
+      sy = 0;
+    } else {
+      // Video is taller → crop top/bottom
+      sW = vw;
+      sH = vw / canvasAspect;
+      sx = 0;
+      sy = (vh - sH) / 2;
+    }
+    return { sx: sx, sy: sy, sW: sW, sH: sH };
+  }
+
+  // === Draw a single tile from a video using its cover params ===
+  // Given tile (col, row) in a (cols, rows) grid, compute the source
+  // rect inside the video frame and the dest rect on canvas.
+  function drawTile(video, cover, col, row, cols, rows) {
+    var tileW = W / cols;
+    var tileH = H / rows;
+    var dx = col * tileW;
+    var dy = row * tileH;
+    // Source rect: which slice of the cover area this tile maps to
+    var sliceW = cover.sW / cols;
+    var sliceH = cover.sH / rows;
+    var sx = cover.sx + col * sliceW;
+    var sy = cover.sy + row * sliceH;
+    try {
+      ctx.drawImage(video, sx, sy, sliceW, sliceH, dx, dy, tileW + 1, tileH + 1);
+      // +1 to avoid sub-pixel gaps between tiles
+    } catch (e) {}
+  }
+
+  // === Main render ===
+  // Each frame: compute t from scroll, derive cols/rows from t,
+  // walk every tile and decide if it shows video A or B (or empty=brand bg).
+  function render() {
+    var t = computeProgress();
+
+    // Update progress readout (snap to integer for display)
+    if (progressEl) {
+      progressEl.textContent = String(Math.round(t * 100)).padStart(3, '0') + ' %';
+    }
+
+    // Granularity interpolation:
+    //   t = 0  → cols 16 (chunky tiles)
+    //   t = 1  → cols 64 (fine tiles)
+    var minCols = 16;
+    var maxCols = 64;
+    // Use eased curve so finger-feel matches: middle of scroll
+    // is around the "handoff" point where tiles should still be
+    // medium-chunky, getting really fine only near the end.
+    var gridT = t * t;
+    var cols = Math.round(minCols + (maxCols - minCols) * gridT);
+    // Keep tiles roughly square based on canvas aspect
+    var rows = Math.max(4, Math.round(cols * (H / W)));
+    if (rows > MAX_GRID) rows = MAX_GRID;
+    if (cols > MAX_GRID) cols = MAX_GRID;
+
+    // Pull cover params for both videos
+    var coverA = coverParams(videoA);
+    var coverB = coverParams(videoB);
+
+    // Brand background — fills any "empty" tile gaps and the
+    // background everywhere a tile decides not to draw.
+    ctx.fillStyle = '#01017c';
+    ctx.fillRect(0, 0, W, H);
+
+    // Walk grid
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        // Stable random delay per (c, r). Use modulo of MAX_GRID so
+        // the map repeats cleanly across grid sizes — and because
+        // the same (c,r) at different cols/rows would land on
+        // different delays, the layout looks slightly different at
+        // each scale (which is what we want: not the same dots
+        // morphing, but a new sprinkle each time grid changes).
+        var idx = ((r % MAX_GRID) * MAX_GRID) + (c % MAX_GRID);
+        var delay = delayMap[idx];
+
+        // Per-tile local progress through its 0.5-wide window
+        var localT = (t - delay * 0.5) / 0.5;
+
+        if (t < 0.5) {
+          // PHASE 1: video A disarming.
+          // Tile shows A if localT < 0 (its turn hasn't come to leave)
+          // When localT ≥ 0, the tile is "gone" → brand bg shows.
+          if (localT < 0) {
+            drawTile(videoA, coverA, c, r, cols, rows);
+          }
+        } else {
+          // PHASE 2: video B arming.
+          // Tile shows B if localT ≥ 1 (its turn has come to arrive).
+          // While localT < 1, the tile is still "incoming" → brand bg.
+          if (localT >= 1) {
+            drawTile(videoB, coverB, c, r, cols, rows);
+          }
+        }
+      }
+    }
+  }
+
+  // === Loop with visibility gating ===
+  function loop() {
+    if (!window.__tabActive || (window.__sectionVisible && window.__sectionVisible['section-pixtrans'] === false)) {
+      // Pause both videos while section offscreen
+      if (!videoA.paused) videoA.pause();
+      if (!videoB.paused) videoB.pause();
+      requestAnimationFrame(loop);
+      return;
+    }
+    // Section visible: make sure both videos are playing
+    if (videoA.paused && videoA.readyState >= 2) {
+      videoA.play().catch(function(){});
+    }
+    if (videoB.paused && videoB.readyState >= 2) {
+      videoB.play().catch(function(){});
+    }
+    render();
+    requestAnimationFrame(loop);
+  }
+
+  setup();
+  // Boot loop after both videos can play
+  function tryPlay() {
+    videoA.play().catch(function(){});
+    videoB.play().catch(function(){});
+  }
+  videoA.addEventListener('loadeddata', tryPlay);
+  videoB.addEventListener('loadeddata', tryPlay);
+  if (videoA.readyState >= 2 && videoB.readyState >= 2) tryPlay();
+
+  requestAnimationFrame(loop);
+})();
+
+</script>
+
+</body>
+</html>
