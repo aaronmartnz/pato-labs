@@ -1150,6 +1150,8 @@ var _mainL=document.getElementById('loader-pato');_mainL.innerHTML=PATO[0];_pels
   <span class="footer-copy">&#169; 2026 Aarón Martínez · PATOlabs</span>
 </footer>
 
+<button class="back-to-top" id="backToTop" aria-label="Volver arriba" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
 <script>
 /* FILTER */
 function filterCards(btn) {
@@ -1326,6 +1328,7 @@ document.addEventListener('keydown', function(e){
     _pels.push(ld);
     if (img.complete && img.naturalWidth) { w.classList.add('loaded'); return; }
     img.addEventListener('load', function(){ w.classList.add('loaded'); });
+    img.addEventListener('error', function(){ w.classList.add('loaded'); });
   });
 })();
 
@@ -1345,6 +1348,5 @@ window.addEventListener('scroll', function(){
   btt.classList.toggle('visible', window.scrollY > 600);
 });
 </script>
-<button class="back-to-top" id="backToTop" aria-label="Volver arriba" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
 </body>
 </html>
