@@ -1156,7 +1156,10 @@ function filterCards(btn) {
   var f = btn.dataset.filter;
   document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
-  document.querySelectorAll('.card').forEach(function(c){
+  // Recorre el snapshot completo (_allCards), no el DOM: la masonry desprende
+  // las cards ocultas, así que querySelectorAll('.card') solo vería las visibles.
+  var cards = _allCards.length ? _allCards : Array.prototype.slice.call(document.querySelectorAll('.card'));
+  cards.forEach(function(c){
     c.classList.toggle('hidden', f !== 'all' && c.dataset.category !== f);
   });
   layoutMasonry();
